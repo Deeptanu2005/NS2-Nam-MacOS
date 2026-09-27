@@ -1,0 +1,135 @@
+#!/bin/bash
+
+set -e
+
+NS2_HOME="$HOME/NS2Nam"
+SIM_DIR="$NS2_HOME/simulations"
+IMAGE="ns2-nam:latest"
+
+RED='\033[31m'
+GREEN='\033[32m'
+YELLOW='\033[33m'
+CYAN='\033[36m'
+RESET='\033[0m'
+
+info() {
+    printf "${CYAN}%s${RESET}\n" "$1"
+}
+
+success() {
+    printf "${GREEN}%s${RESET}\n" "$1"
+}
+
+error() {
+    printf "${RED}%s${RESET}\n" "$1" >&2
+}
+
+warning() {
+    printf "${YELLOW}%s${RESET}\n" "$1"
+}
+
+# ------------------------------------------------------------
+# Verify Docker
+# ------------------------------------------------------------
+
+if ! command -v docker >/dev/null 2>&1; then
+    error "Error: Docker is not installed."
+    exit 1
+fi
+
+if ! docker info >/dev/null 2>&1; then
+    error "Error: Docker Desktop is not running."
+    echo "Start Docker Desktop and try again."
+    exit 1
+fi
+
+# ------------------------------------------------------------
+# Verify project directory
+# ------------------------------------------------------------
+
+if [ ! -d "$SIM_DIR" ]; then
+    error "Error: Simulation directory does not exist:"
+    echo "$SIM_DIR"
+    exit 1
+fi
+
+# ------------------------------------------------------------
+# Start XQuartz if necessary
+# ------------------------------------------------------------
+
+if ! pgrep -x XQuartz >/dev/null 2>&1 && \
+   ! pgrep -x X11.bin >/dev/null 2>&1; then
+
+    info "Starting XQuartz..."
+    open -a XQuartz
+    sleep 3
+fi
+
+# ------------------------------------------------------------
+# Verify Xauthority
+# ------------------------------------------------------------
+
+if [ ! -f "$HOME/.Xauthority" ]; then
+    error "Error: XQuartz Xauthority file not found:"
+    echo "$HOME/.Xauthority"
+    exit 1
+fi
+
+# ------------------------------------------------------------
+# Determine host IP
+# ------------------------------------------------------------
+
+HOST_IP=$(ipconfig getifaddr en0 2>/dev/null || true)
+
+if [ -z "$HOST_IP" ]; then
+    HOST_IP=$(ipconfig getifaddr en1 2>/dev/null || true)
+fi
+
+if [ -z "$HOST_IP" ]; then
+    error "Error: Could not determine the Mac IP address."
+    exit 1
+fi
+
+# ------------------------------------------------------------
+# Verify Docker image
+# ------------------------------------------------------------
+
+if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
+    error "Error: Docker image '$IMAGE' was not found."
+    echo
+    echo "Build the image with:"
+    echo
+    echo "  docker build --platform linux/amd64 -t $IMAGE $NS2_HOME"
+    echo
+    exit 1
+fi
+
+# ------------------------------------------------------------
+# Display environment information
+# ------------------------------------------------------------
+
+printf "\n"
+printf "${CYAN}======================================${RESET}\n"
+printf "${CYAN} NS-2 + NAM Environment${RESET}\n"
+printf "${CYAN}======================================${RESET}\n"
+printf "Home        : %s\n" "$NS2_HOME"
+printf "Simulations : %s\n" "$SIM_DIR"
+printf "Display     : %s:0\n" "$HOST_IP"
+printf "Architecture: linux/amd64\n"
+printf "${CYAN}======================================${RESET}\n"
+printf "\n"
+
+success "Starting NS-2 environment..."
+
+# ------------------------------------------------------------
+# Start container
+# ------------------------------------------------------------
+
+docker run -it --rm \
+    --platform linux/amd64 \
+    -e DISPLAY="${HOST_IP}:0" \
+    -e XAUTHORITY=/root/.Xauthority \
+    -v "$HOME/.Xauthority:/root/.Xauthority:ro" \
+    -v "$SIM_DIR:/simulations" \
+    -w /simulations \
+    "$IMAGE"
