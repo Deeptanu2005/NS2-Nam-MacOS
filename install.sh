@@ -2,7 +2,7 @@
 
 set -e
 
-REPO_URL="https://github.com/Deeptanu2005/NS2-Nam-MacOS.git"
+BASE_URL="https://raw.githubusercontent.com/Deeptanu2005/NS2-Nam-MacOS/main"
 INSTALL_DIR="$HOME/NS2Nam"
 IMAGE_NAME="ns2-nam:latest"
 
@@ -30,33 +30,23 @@ error() {
 
 printf "\n"
 printf "${CYAN}========================================${RESET}\n"
-printf "${CYAN} NS2Nam - macOS Installer${RESET}\n"
+printf "${CYAN} NS2-Nam for macOS${RESET}\n"
 printf "${CYAN}========================================${RESET}\n\n"
 
-# ------------------------------------------------------------
-# Check operating system
-# ------------------------------------------------------------
-
+# Check macOS
 if [ "$(uname -s)" != "Darwin" ]; then
     error "This installer is intended for macOS."
     exit 1
 fi
 
-# ------------------------------------------------------------
 # Check Docker
-# ------------------------------------------------------------
-
 if ! command -v docker >/dev/null 2>&1; then
     error "Docker is not installed."
-    echo "Install Docker Desktop for Mac and run this installer again."
+    echo "Install Docker Desktop and run this installer again."
     exit 1
 fi
 
 success "Docker found."
-
-# ------------------------------------------------------------
-# Check Docker Desktop
-# ------------------------------------------------------------
 
 if ! docker info >/dev/null 2>&1; then
     error "Docker Desktop is not running."
@@ -66,10 +56,7 @@ fi
 
 success "Docker Desktop is running."
 
-# ------------------------------------------------------------
 # Check XQuartz
-# ------------------------------------------------------------
-
 if ! command -v xquartz >/dev/null 2>&1 && \
    [ ! -d "/Applications/Utilities/XQuartz.app" ] && \
    [ ! -d "/Applications/XQuartz.app" ]; then
@@ -81,50 +68,32 @@ fi
 
 success "XQuartz found."
 
-# ------------------------------------------------------------
-# Create / update project directory
-# ------------------------------------------------------------
+# Create directories
+mkdir -p "$INSTALL_DIR/bin"
+mkdir -p "$INSTALL_DIR/simulations"
 
-if [ -d "$INSTALL_DIR/.git" ]; then
+# Download required files
+info "Downloading NS2-Nam files..."
 
-    info "Existing NS2Nam installation detected."
+curl -fsSL "$BASE_URL/Dockerfile" \
+    -o "$INSTALL_DIR/Dockerfile"
 
-    cd "$INSTALL_DIR"
+curl -fsSL "$BASE_URL/bin/ns2" \
+    -o "$INSTALL_DIR/bin/ns2"
 
-    git pull --ff-only
+curl -fsSL "$BASE_URL/simulations/send_receive.tcl" \
+    -o "$INSTALL_DIR/simulations/send_receive.tcl"
 
-else
+chmod +x "$INSTALL_DIR/bin/ns2"
 
-    if [ -d "$INSTALL_DIR" ]; then
-        warning "$INSTALL_DIR already exists but is not a Git repository."
+success "Files downloaded."
 
-        if [ -d "$INSTALL_DIR/simulations" ]; then
-            warning "Existing simulations will be preserved."
-        fi
-
-    else
-        info "Downloading NS2Nam..."
-        git clone "$REPO_URL" "$INSTALL_DIR"
-    fi
-
-fi
-
-cd "$INSTALL_DIR"
-
-mkdir -p simulations examples bin
-
-# ------------------------------------------------------------
 # Configure XQuartz
-# ------------------------------------------------------------
-
 info "Configuring XQuartz..."
 
 defaults write org.xquartz.X11 nolisten_tcp -bool false
 
-# ------------------------------------------------------------
 # Start XQuartz
-# ------------------------------------------------------------
-
 if ! pgrep -x XQuartz >/dev/null 2>&1 && \
    ! pgrep -x X11.bin >/dev/null 2>&1; then
 
@@ -133,19 +102,13 @@ if ! pgrep -x XQuartz >/dev/null 2>&1 && \
     sleep 3
 fi
 
-# ------------------------------------------------------------
 # Allow local X11 clients
-# ------------------------------------------------------------
-
 if command -v xhost >/dev/null 2>&1; then
     xhost +localhost >/dev/null 2>&1 || true
 fi
 
-# ------------------------------------------------------------
 # Build Docker image
-# ------------------------------------------------------------
-
-info "Building NS2Nam Docker image..."
+info "Building NS2-Nam Docker image..."
 
 docker build \
     --platform linux/amd64 \
@@ -154,23 +117,19 @@ docker build \
 
 success "Docker image built."
 
-# ------------------------------------------------------------
 # Install global command
-# ------------------------------------------------------------
-
 mkdir -p "$HOME/.local/bin"
 
 cp "$INSTALL_DIR/bin/ns2" "$HOME/.local/bin/ns2"
 chmod +x "$HOME/.local/bin/ns2"
 
-# ------------------------------------------------------------
 # Configure PATH
-# ------------------------------------------------------------
-
 add_path_to_shell() {
     local rc_file="$1"
 
-    if [ -f "$rc_file" ] && ! grep -Fq 'export PATH="$HOME/.local/bin:$PATH"' "$rc_file"; then
+    if [ -f "$rc_file" ] && \
+       ! grep -Fq '# NS2Nam' "$rc_file"; then
+
         printf '\n# NS2Nam\nexport PATH="$HOME/.local/bin:$PATH"\n' >> "$rc_file"
     fi
 }
@@ -180,24 +139,8 @@ add_path_to_shell "$HOME/.bashrc"
 
 export PATH="$HOME/.local/bin:$PATH"
 
-# ------------------------------------------------------------
 # Verify installation
-# ------------------------------------------------------------
-
-if ! command -v ns2 >/dev/null 2>&1; then
-    error "The ns2 command could not be added to the current PATH."
-    echo
-    echo "Restart your terminal and run:"
-    echo
-    echo "    ns2"
-    exit 1
-fi
-
-# ------------------------------------------------------------
-# Verify Docker environment
-# ------------------------------------------------------------
-
-info "Verifying NS-2 environment..."
+info "Verifying NS2-Nam environment..."
 
 docker run --rm \
     --platform linux/amd64 \
@@ -205,10 +148,6 @@ docker run --rm \
     sh -c 'which ns && which nam && which tclsh' >/dev/null
 
 success "NS-2, NAM and Tcl verified."
-
-# ------------------------------------------------------------
-# Installation complete
-# ------------------------------------------------------------
 
 printf "\n"
 printf "${GREEN}========================================${RESET}\n"
@@ -224,11 +163,7 @@ echo
 echo "Simulation directory:"
 echo "  $INSTALL_DIR/simulations"
 echo
-echo "Test installation:"
+echo "Start the environment with:"
 echo
 echo "  ns2"
-echo
-echo "Then inside the container:"
-echo
-echo "  ns send_receive.tcl"
 echo
