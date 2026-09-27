@@ -1,4 +1,4 @@
-# NS2-Nam for macOS
+# NS2-Nam for MacOS
 
 A simple Docker-based NS-2 + NAM environment for macOS, including Apple Silicon support.
 
@@ -55,9 +55,9 @@ The installation creates:
 
 &nbsp;&nbsp;`├── Dockerfile`  
 &nbsp;&nbsp;`├── bin/`  
-&nbsp;&nbsp;`│&nbsp;&nbsp;&nbsp;└── ns2`  
+&nbsp;&nbsp;`│    └── ns2`  
 &nbsp;&nbsp;`└── simulations/`  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`└── send_receive.tcl`
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`   └── send_receive.tcl`
 
 Put your own `.tcl` files inside:
 
