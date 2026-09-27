@@ -21,11 +21,12 @@ curl -fsSL https://raw.githubusercontent.com/Deeptanu2005/NS2-Nam-MacOS/main/ins
 
 The installer automatically:
 
-- Downloads NS2-Nam to `~/NS2Nam`
+- Downloads the required NS2-Nam files to `~/NS2Nam`
 - Configures XQuartz
 - Builds the Docker environment
 - Installs the global `ns2` command
 - Creates the `simulations` directory
+- Adds a sample simulation
 - Verifies NS-2, NAM and Tcl
 
 ## Usage
@@ -36,13 +37,7 @@ Start the NS-2 environment:
 ns2
 ```
 
-Inside the environment:
-
-```bash
-ns
-nam
-tclsh
-```
+Inside the environment, you can use `ns`, `nam` and `tclsh`.
 
 Run a simulation:
 
@@ -50,36 +45,27 @@ Run a simulation:
 ns send_receive.tcl
 ```
 
-NAM can be launched from Tcl:
-
-```tcl
-exec nam send_receive.nam &
-```
+NAM can be launched from Tcl using `exec nam send_receive.nam &`.
 
 ## Directory
 
-```text
-~/NS2Nam/
-├── Dockerfile
-├── install.sh
-├── uninstall.sh
-├── bin/
-│   └── ns2
-└── simulations/
-    └── send_receive.tcl
-```
+The installation creates:
+
+`~/NS2Nam/`
+
+&nbsp;&nbsp;`├── Dockerfile`  
+&nbsp;&nbsp;`├── bin/`  
+&nbsp;&nbsp;`│&nbsp;&nbsp;&nbsp;└── ns2`  
+&nbsp;&nbsp;`└── simulations/`  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`└── send_receive.tcl`
 
 Put your own `.tcl` files inside:
 
-```text
-~/NS2Nam/simulations/
-```
+`~/NS2Nam/simulations/`
 
-They are available inside the container at:
+Inside the Docker environment, this directory is available at:
 
-```text
-/simulations
-```
+`/simulations`
 
 ## Apple Silicon
 
@@ -87,27 +73,25 @@ NS-2 and NAM run using the `linux/amd64` architecture through Docker, allowing t
 
 ## Uninstallation
 
-The uninstaller is intentionally not provided as a direct `curl | bash` command.
+The uninstaller is intentionally not included in the normal installation process.
 
-Download it first:
+To uninstall, download the script manually:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Deeptanu2005/NS2-Nam-MacOS/main/uninstall.sh -o /tmp/ns2nam-uninstall.sh
 ```
 
-Review and run:
+Review and run it:
 
 ```bash
 bash /tmp/ns2nam-uninstall.sh
 ```
 
-The uninstaller requires explicit confirmation.
+The uninstaller requires explicit confirmation before removing anything.
 
-It removes only NS2-Nam resources and preserves:
+It removes only resources associated with this NS2-Nam installation and preserves your:
 
-```text
-~/NS2Nam/simulations/
-```
+`~/NS2Nam/simulations/`
 
 Other Docker images, containers, volumes and Docker Desktop data are not removed.
 
