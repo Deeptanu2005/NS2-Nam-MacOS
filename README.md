@@ -1,6 +1,8 @@
 # NS2-Nam for MacOS
 
-A simple Docker-based NS-2 + NAM environment for macOS, including Apple Silicon support.
+A simple Docker-based NS-2 + NAM environment for macOS Apple Silicon support.
+
+<img width="1774" height="887" alt="EA64F7E2-C41C-4D69-A30E-593BC2769E4E" src="https://github.com/user-attachments/assets/099bdbe4-b4a7-4f11-9828-ea7913e15ea1" />
 
 ## Requirements
 
@@ -9,7 +11,8 @@ Install:
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [XQuartz](https://www.xquartz.org/)
 
-Docker Desktop must be running.
+Docker Desktop must be running. <br>
+The device must be connected to the internet.
 
 ## Installation
 
@@ -51,8 +54,7 @@ NAM can be launched from Tcl using `exec nam send_receive.nam &`.
 
 The installation creates:
 
-`~/NS2Nam/`
-
+`~/NS2Nam/` <br>
 &nbsp;&nbsp;`├── Dockerfile`  
 &nbsp;&nbsp;`├── bin/`  
 &nbsp;&nbsp;`│    └── ns2`  
@@ -70,6 +72,9 @@ Inside the Docker environment, this directory is available at:
 ## Apple Silicon
 
 NS-2 and NAM run using the `linux/amd64` architecture through Docker, allowing the environment to work on Apple Silicon Macs.
+
+<img width="1774" height="887" alt="FBF42041-D77A-49E1-9881-6C1E23E50B85" src="https://github.com/user-attachments/assets/4ff3e3ca-2591-4644-8c08-7da7ff39d806" />
+
 
 ## Uninstallation
 
