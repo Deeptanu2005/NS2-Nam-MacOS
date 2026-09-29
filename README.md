@@ -52,6 +52,8 @@ The included sample writes `send_receive.nam` and launches NAM automatically
 when the simulation finishes. To launch NAM manually, run
 `nam send_receive.nam` from the simulations directory.
 
+See the [FAQ](docs/FAQ.md) for setup, usage, and troubleshooting help.
+
 When `ns2` starts, it copies only the active XQuartz MIT-MAGIC-COOKIE to a
 temporary file readable only by your account. That file is mounted read-only
 into the container and removed when `ns2` exits. The workflow does not grant
