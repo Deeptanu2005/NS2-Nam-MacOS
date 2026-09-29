@@ -102,6 +102,11 @@ if ! pgrep -x XQuartz >/dev/null 2>&1 && \
     sleep 3
 fi
 
+# Allow local X11 clients, including the Docker environment, to connect.
+if command -v xhost >/dev/null 2>&1; then
+    xhost +localhost >/dev/null 2>&1 || true
+fi
+
 # Build Docker image
 info "Building NS2-Nam Docker image..."
 

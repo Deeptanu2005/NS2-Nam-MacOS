@@ -11,8 +11,7 @@ RUN printf 'deb http://archive.debian.org/debian buster main\n' \
         ns2 \
         nam \
         tclsh \
-        x11-utils \
-        xauth && \
+        x11-utils && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /simulations

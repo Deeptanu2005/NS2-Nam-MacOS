@@ -26,17 +26,15 @@ finishes. You can also open it manually with `nam send_receive.nam`.
 ## Why does NAM fail to open?
 
 Make sure XQuartz is installed and running, then start a new `ns2` session.
-The launcher uses the active XQuartz MIT-MAGIC-COOKIE from your Xauthority
-database. It places that cookie in a temporary, account-readable file, mounts
-the file read-only in the container, and removes it when `ns2` exits. The
-project does not require `xhost` access grants.
+The installer and launcher enable local X11 connections by running
+`xhost +localhost`. If XQuartz was already running, close and reopen it, then
+run `ns2` again.
 
-## Why does `ns2` report that no X11 authentication cookie was found?
+## Does the project configure X11 access?
 
-Start XQuartz and try again from a new Terminal session. If the error
-continues, quit and reopen XQuartz so it can initialize its authentication
-cookie. Also check that the `xauth` command is available; it is supplied with
-XQuartz.
+Yes. The launcher uses `xhost +localhost` to allow local clients, including
+the Docker environment, to connect to XQuartz. The uninstaller runs
+`xhost -localhost` to revoke that grant.
 
 ## Does it work on Apple Silicon?
 

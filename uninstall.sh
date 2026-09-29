@@ -23,7 +23,7 @@ printf "${RED}  - NS2Nam Docker image${RESET}\n"
 printf "${RED}  - Containers created from the NS2Nam image${RESET}\n"
 printf "${RED}  - Global 'ns2' command${RESET}\n"
 printf "${RED}  - NS2Nam project files${RESET}\n"
-printf "${RED}  - Legacy XQuartz localhost access grant, if present${RESET}\n"
+printf "${RED}  - XQuartz localhost access grant${RESET}\n"
 printf "\n"
 
 printf "${GREEN}The following will NOT be removed:${RESET}\n"
@@ -49,8 +49,7 @@ fi
 printf "\n"
 printf "${CYAN}Starting NS2Nam uninstallation...${RESET}\n\n"
 
-# Older installer versions enabled local X11 clients with xhost. Revoke that
-# grant while preserving the user's Xauthority database and other XQuartz settings.
+# Revoke the localhost X11 access grant enabled by the installer and launcher.
 if command -v xhost >/dev/null 2>&1; then
     xhost -localhost >/dev/null 2>&1 || true
 fi

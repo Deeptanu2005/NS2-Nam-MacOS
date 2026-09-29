@@ -25,7 +25,7 @@ curl -fsSL https://raw.githubusercontent.com/Deeptanu2005/NS2-Nam-MacOS/main/ins
 The installer automatically:
 
 - Downloads the required NS2-Nam files to `~/NS2Nam`
-- Configures XQuartz for MIT-MAGIC-COOKIE authenticated NAM access
+- Configures XQuartz and enables local X11 connections with `xhost +localhost`
 - Builds the Docker environment
 - Installs the global `ns2` command
 - Creates the `simulations` directory
@@ -54,10 +54,9 @@ when the simulation finishes. To launch NAM manually, run
 
 See the [FAQ](docs/FAQ.md) for setup, usage, and troubleshooting help.
 
-When `ns2` starts, it copies only the active XQuartz MIT-MAGIC-COOKIE to a
-temporary file readable only by your account. That file is mounted read-only
-into the container and removed when `ns2` exits. The workflow does not grant
-X11 access with `xhost`.
+The installer and `ns2` launcher run `xhost +localhost` so local Docker X11
+clients can connect to XQuartz. XQuartz must be running for NAM windows to
+appear.
 
 ## Directory
 
@@ -108,8 +107,7 @@ It removes only resources associated with this NS2-Nam installation and preserve
 `~/NS2Nam/simulations/`
 
 Other Docker images, containers, volumes and Docker Desktop data are not removed.
-The uninstaller also revokes the `xhost +localhost` grant used by older
-versions, if present, while leaving your Xauthority database intact.
+The uninstaller also revokes the `xhost +localhost` grant.
 
 ## Version
 
