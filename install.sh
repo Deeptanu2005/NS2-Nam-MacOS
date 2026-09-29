@@ -167,3 +167,6 @@ echo "Start the environment with:"
 echo
 echo "  ns2"
 echo
+printf "${YELLOW}Note: I’ve worked hard on this project. If you find it useful, please consider supporting its development. Support is completely optional.${RESET}\n"
+printf "${CYAN}  https://www.buymeacoffee.com/deeptanusen${RESET}\n"
+echo
