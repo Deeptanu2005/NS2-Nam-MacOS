@@ -26,15 +26,17 @@ finishes. You can also open it manually with `nam send_receive.nam`.
 ## Why does NAM fail to open?
 
 Make sure XQuartz is installed and running, then start a new `ns2` session.
-The installer and launcher enable local X11 connections by running
-`xhost +localhost`. If XQuartz was already running, close and reopen it, then
-run `ns2` again.
+The installer enables local X11 connections by running `xhost +localhost`.
+The launcher also requires `~/.Xauthority` to exist and mounts it read-only
+into the container. If XQuartz was already running during installation, close
+and reopen it, then run `ns2` again.
 
 ## Does the project configure X11 access?
 
-Yes. The launcher uses `xhost +localhost` to allow local clients, including
-the Docker environment, to connect to XQuartz. The uninstaller runs
-`xhost -localhost` to revoke that grant.
+Yes. The installer uses `xhost +localhost` to allow local clients, including
+the Docker environment, to connect to XQuartz. The launcher mounts
+`~/.Xauthority` read-only for X11 authentication. The uninstaller runs
+`xhost -localhost` to revoke the grant.
 
 ## Does it work on Apple Silicon?
 

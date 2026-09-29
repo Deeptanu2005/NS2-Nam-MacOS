@@ -54,9 +54,10 @@ when the simulation finishes. To launch NAM manually, run
 
 See the [FAQ](docs/FAQ.md) for setup, usage, and troubleshooting help.
 
-The installer and `ns2` launcher run `xhost +localhost` so local Docker X11
-clients can connect to XQuartz. XQuartz must be running for NAM windows to
-appear.
+The installer runs `xhost +localhost` so local Docker X11 clients can connect
+to XQuartz. The `ns2` launcher mounts your `~/.Xauthority` file read-only into
+the container for X11 authentication. XQuartz must be running for NAM windows
+to appear.
 
 ## Directory
 
