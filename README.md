@@ -85,6 +85,9 @@ NS-2 and NAM run using the `linux/amd64` architecture through Docker, allowing t
 <!-- <img width="1774" height="887" alt="FBF42041-D77A-49E1-9881-6C1E23E50B85" src="https://github.com/user-attachments/assets/4ff3e3ca-2591-4644-8c08-7da7ff39d806" /> -->
 <img width="1774" height="887" alt="ACBE0F5A-DA86-49AA-B251-03D3DAE7CBBB" src="https://github.com/user-attachments/assets/14f0e0c8-e497-4553-8451-496876af1640" />
 
+See the [compatibility notes](docs/COMPATIBILITY.md) for platform details and
+known limitations.
+
 ## Uninstallation
 
 The uninstaller is intentionally not included in the normal installation process.
