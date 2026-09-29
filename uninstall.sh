@@ -23,6 +23,7 @@ printf "${RED}  - NS2Nam Docker image${RESET}\n"
 printf "${RED}  - Containers created from the NS2Nam image${RESET}\n"
 printf "${RED}  - Global 'ns2' command${RESET}\n"
 printf "${RED}  - NS2Nam project files${RESET}\n"
+printf "${RED}  - Legacy XQuartz localhost access grant, if present${RESET}\n"
 printf "\n"
 
 printf "${GREEN}The following will NOT be removed:${RESET}\n"
@@ -48,6 +49,12 @@ fi
 printf "\n"
 printf "${CYAN}Starting NS2Nam uninstallation...${RESET}\n\n"
 
+# Older installer versions enabled local X11 clients with xhost. Revoke that
+# grant while preserving the user's Xauthority database and other XQuartz settings.
+if command -v xhost >/dev/null 2>&1; then
+    xhost -localhost >/dev/null 2>&1 || true
+fi
+
 # ------------------------------------------------------------
 # Remove NS2Nam Docker resources
 # ------------------------------------------------------------
@@ -57,20 +64,57 @@ if command -v docker >/dev/null 2>&1; then
     if docker info >/dev/null 2>&1; then
 
         CONTAINERS=$(docker ps -aq --filter "ancestor=${IMAGE_NAME}" 2>/dev/null || true)
-
-        if [ -n "$CONTAINERS" ]; then
-            printf "${CYAN}Removing NS2Nam containers...${RESET}\n"
-            docker rm -f $CONTAINERS >/dev/null
-        fi
+        IMAGE_EXISTS=false
 
         if docker image inspect "$IMAGE_NAME" >/dev/null 2>&1; then
-            printf "${CYAN}Removing NS2Nam Docker image...${RESET}\n"
-            docker image rm "$IMAGE_NAME" >/dev/null
+            IMAGE_EXISTS=true
+        fi
+
+        if [ -n "$CONTAINERS" ] || [ "$IMAGE_EXISTS" = true ]; then
+
+            printf "\n"
+            printf "${RED}Docker resources detected:${RESET}\n"
+
+            if [ -n "$CONTAINERS" ]; then
+                printf "${RED}  - NS2Nam containers${RESET}\n"
+            fi
+
+            if [ "$IMAGE_EXISTS" = true ]; then
+                printf "${RED}  - Docker image: ${IMAGE_NAME}${RESET}\n"
+            fi
+
+            printf "\n"
+            printf "${YELLOW}Do you want to remove these NS2Nam Docker resources? [y/N]: ${RESET}"
+            read -r DOCKER_CONFIRMATION
+
+            case "$DOCKER_CONFIRMATION" in
+                y|Y|yes|YES|Yes)
+
+                    if [ -n "$CONTAINERS" ]; then
+                        printf "${CYAN}Removing NS2Nam containers...${RESET}\n"
+                        docker rm -f $CONTAINERS >/dev/null
+                    fi
+
+                    if [ "$IMAGE_EXISTS" = true ]; then
+                        printf "${CYAN}Removing NS2Nam Docker image...${RESET}\n"
+                        docker image rm "$IMAGE_NAME" >/dev/null
+                    fi
+
+                    printf "${GREEN}NS2Nam Docker resources removed.${RESET}\n"
+                    ;;
+
+                *)
+                    printf "${YELLOW}Docker resources were kept.${RESET}\n"
+                    ;;
+            esac
+
+        else
+            printf "${GREEN}No NS2Nam Docker resources found.${RESET}\n"
         fi
 
     else
         printf "${YELLOW}Docker Desktop is not running.${RESET}\n"
-        printf "${YELLOW}Docker resources were not removed.${RESET}\n"
+        printf "${YELLOW}Docker resources were not modified.${RESET}\n"
     fi
 
 fi

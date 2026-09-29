@@ -66,12 +66,39 @@ if ! pgrep -x XQuartz >/dev/null 2>&1 && \
 fi
 
 # ------------------------------------------------------------
-# Verify Xauthority
+# Create a temporary Xauthority file for the container
 # ------------------------------------------------------------
 
-if [ ! -f "$HOME/.Xauthority" ]; then
-    error "Error: XQuartz Xauthority file not found:"
-    echo "$HOME/.Xauthority"
+if ! command -v xauth >/dev/null 2>&1; then
+    error "Error: xauth is not installed."
+    echo "Install or reinstall XQuartz, then try again."
+    exit 1
+fi
+
+XQUARTZ_DISPLAY="${DISPLAY:-:0}"
+XAUTH_ENTRIES=$(xauth nlist "$XQUARTZ_DISPLAY" 2>/dev/null | \
+    awk '$4 == "4d49542d4d414749432d434f4f4b49452d31"' || true)
+
+if [ -z "$XAUTH_ENTRIES" ]; then
+    error "Error: No X11 authentication cookie found for display '$XQUARTZ_DISPLAY'."
+    echo "Make sure XQuartz is running and try again."
+    exit 1
+fi
+
+CONTAINER_XAUTH=$(mktemp "${TMPDIR:-/tmp}/ns2nam-xauth.XXXXXX")
+chmod 600 "$CONTAINER_XAUTH"
+trap 'rm -f "$CONTAINER_XAUTH"' EXIT
+
+# XQuartz's cookie is keyed to the local display name. Use the same cookie
+# for the container's TCP connection without copying unrelated host cookies.
+if ! printf '%s\n' "$XAUTH_ENTRIES" | sed 's/^..../ffff/' | \
+    xauth -f "$CONTAINER_XAUTH" nmerge - >/dev/null 2>&1; then
+    error "Error: Could not prepare the X11 authentication file."
+    exit 1
+fi
+
+if [ ! -s "$CONTAINER_XAUTH" ]; then
+    error "Error: The X11 authentication file is empty."
     exit 1
 fi
 
@@ -129,7 +156,7 @@ docker run -it --rm \
     --platform linux/amd64 \
     -e DISPLAY="${HOST_IP}:0" \
     -e XAUTHORITY=/root/.Xauthority \
-    -v "$HOME/.Xauthority:/root/.Xauthority:ro" \
+    -v "$CONTAINER_XAUTH:/root/.Xauthority:ro" \
     -v "$SIM_DIR:/simulations" \
     -w /simulations \
     "$IMAGE"

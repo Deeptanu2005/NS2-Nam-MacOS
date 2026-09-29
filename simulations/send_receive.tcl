@@ -9,7 +9,7 @@ set ns [new Simulator]
 # NAM configuration
 # ------------------------------------------------------------
 
-set namfile [open send_3receivers.nam w]
+set namfile [open send_receive.nam w]
 $ns namtrace-all $namfile
 
 # Define flow colors
@@ -161,7 +161,7 @@ proc finish {} {
     close $namfile
 
     # Automatically open NAM
-    exec nam send_3receivers.nam &
+    exec nam send_receive.nam &
 
     exit 0
 }
