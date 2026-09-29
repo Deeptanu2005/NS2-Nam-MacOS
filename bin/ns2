@@ -28,10 +28,6 @@ warning() {
     printf "${YELLOW}%s${RESET}\n" "$1"
 }
 
-# ------------------------------------------------------------
-# Verify Docker
-# ------------------------------------------------------------
-
 if ! command -v docker >/dev/null 2>&1; then
     error "Error: Docker is not installed."
     exit 1
@@ -43,19 +39,11 @@ if ! docker info >/dev/null 2>&1; then
     exit 1
 fi
 
-# ------------------------------------------------------------
-# Verify project directory
-# ------------------------------------------------------------
-
 if [ ! -d "$SIM_DIR" ]; then
     error "Error: Simulation directory does not exist:"
     echo "$SIM_DIR"
     exit 1
 fi
-
-# ------------------------------------------------------------
-# Start XQuartz if necessary
-# ------------------------------------------------------------
 
 if ! pgrep -x XQuartz >/dev/null 2>&1 && \
    ! pgrep -x X11.bin >/dev/null 2>&1; then
@@ -65,14 +53,11 @@ if ! pgrep -x XQuartz >/dev/null 2>&1 && \
     sleep 3
 fi
 
-# Allow local X11 clients, including the Docker environment, to connect.
-if command -v xhost >/dev/null 2>&1; then
-    xhost +localhost >/dev/null 2>&1 || true
+if [ ! -f "$HOME/.Xauthority" ]; then
+    error "Error: XQuartz Xauthority file not found:"
+    echo "$HOME/.Xauthority"
+    exit 1
 fi
-
-# ------------------------------------------------------------
-# Determine host IP
-# ------------------------------------------------------------
 
 HOST_IP=$(ipconfig getifaddr en0 2>/dev/null || true)
 
@@ -85,10 +70,6 @@ if [ -z "$HOST_IP" ]; then
     exit 1
 fi
 
-# ------------------------------------------------------------
-# Verify Docker image
-# ------------------------------------------------------------
-
 if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
     error "Error: Docker image '$IMAGE' was not found."
     echo
@@ -98,10 +79,6 @@ if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
     echo
     exit 1
 fi
-
-# ------------------------------------------------------------
-# Display environment information
-# ------------------------------------------------------------
 
 printf "\n"
 printf "${CYAN}======================================${RESET}\n"
@@ -116,13 +93,11 @@ printf "\n"
 
 success "Starting NS-2 environment..."
 
-# ------------------------------------------------------------
-# Start container
-# ------------------------------------------------------------
-
 docker run -it --rm \
     --platform linux/amd64 \
     -e DISPLAY="${HOST_IP}:0" \
+    -e XAUTHORITY=/root/.Xauthority \
+    -v "$HOME/.Xauthority:/root/.Xauthority:ro" \
     -v "$SIM_DIR:/simulations" \
     -w /simulations \
     "$IMAGE"
