@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://deeptanu2005.github.io/NS2-Nam-MacOS/sitemap.xml

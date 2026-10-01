@@ -1,0 +1,105 @@
+.compatibility-page { padding-bottom: 18px; }
+.compat-hero { padding: 45px 0 34px; border-bottom: 1px solid var(--line); }
+.compat-hero h1 { margin: 15px 0 12px; font-size: clamp(48px, 6.8vw, 72px); line-height: 1.03; font-weight: 700; letter-spacing: -.07em; }
+.compat-hero > p { max-width: 550px; margin: 0; color: var(--muted); font-size: 15px; }
+.compat-section { max-width: 1020px; margin-inline: auto; padding: 43px 0; }
+.compat-section-heading { display: flex; align-items: end; justify-content: space-between; gap: 30px; margin-bottom: 20px; }
+.compat-section-heading .eyebrow { margin-bottom: 8px; }
+.compat-section-heading h2 { margin: 0; font-size: clamp(27px, 3.5vw, 35px); line-height: 1.15; }
+.compat-section-heading > p { max-width: 335px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+
+/* Simple setup overview */
+.compat-ready-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: minmax(220px, auto); gap: 12px; }
+.compat-device-card, .compat-app-card { position: relative; overflow: hidden; min-width: 0; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel); }
+.compat-device-card { display: flex; flex-direction: column; align-items: flex-start; min-height: 220px; padding: 18px; background: radial-gradient(ellipse at 8% 100%, rgba(60, 115, 195, .15), transparent 68%), var(--panel); transition: transform .25s, border-color .25s; }
+.compat-device-card:hover { transform: translateY(-4px) perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)); border-color: color-mix(in srgb, var(--cyan) 48%, var(--line)); }
+.compat-card-index { color: var(--cyan); font: 9px var(--mono); letter-spacing: .12em; }
+.compat-device-card h3, .compat-app-card h3 { margin: 8px 0 5px; font-size: 17px; letter-spacing: -.04em; }
+.compat-device-card p, .compat-app-card p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.65; }
+.compat-chip-icon { display: grid; place-items: center; width: 38px; height: 34px; margin-top: 12px; color: var(--cyan); }
+.compat-chip-icon svg { width: 35px; height: 35px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.chip-generations { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 14px; }
+.chip-generations span { display: inline-flex; align-items: center; justify-content: center; min-width: 35px; min-height: 26px; padding: 0 8px; border: 1px solid color-mix(in srgb, var(--cyan) 24%, var(--line)); border-radius: 5px; background: color-mix(in srgb, var(--cyan) 7%, var(--panel-solid)); color: var(--cyan); font: 9px var(--mono); }
+.compat-app-card { display: flex; flex-direction: column; align-items: flex-start; min-height: 220px; padding: 17px; transition: transform .25s, border-color .25s; }
+.compat-app-card:hover { transform: translateY(-4px) perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)); border-color: color-mix(in srgb, var(--cyan) 48%, var(--line)); }
+.compat-app-icon { display: grid; place-items: center; width: 38px; height: 32px; margin-top: 12px; color: var(--cyan); }
+.compat-app-icon svg { width: 36px; height: 30px; overflow: visible; }
+.docker-icon svg { fill: currentColor; }
+.xquartz-icon svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.compat-app-card h3 { margin-top: 7px; font-size: 15px; }
+.compat-app-card p { font-size: 10px; }
+.app-status { display: inline-flex; align-items: center; gap: 6px; margin-top: auto; padding-top: 9px; color: var(--faint); font: 8px var(--mono); letter-spacing: .08em; }
+.app-status i { width: 5px; height: 5px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); }
+.compat-install-link { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 13px; padding: 13px 16px; border: 1px solid var(--line); border-radius: 7px; background: color-mix(in srgb, var(--cyan) 4%, var(--panel-solid)); color: var(--muted); font-size: 11px; }
+.compat-install-link b { color: var(--cyan); font-size: 11px; }
+.compat-install-link i { margin-left: 8px; font-style: normal; }
+.compat-install-link:hover { border-color: color-mix(in srgb, var(--cyan) 50%, var(--line)); }
+
+/* How the runtime and graphical display connect */
+.compat-technical { max-width: 1020px; margin: 7px auto 33px; padding: 27px; border: 1px solid var(--line-strong); border-radius: 12px; background: linear-gradient(140deg, color-mix(in srgb, var(--panel-solid) 94%, var(--cyan)), var(--panel-solid)); }
+.compat-technical .compat-section-heading { margin-bottom: 18px; }
+.compat-technical .compat-section-heading > p { max-width: 300px; }
+.compat-flow { display: grid; grid-template-columns: 1fr 28px 1fr 28px 1fr; align-items: center; gap: 8px; }
+.flow-node { display: flex; align-items: center; gap: 11px; min-width: 0; padding: 12px; border: 1px solid var(--line); border-radius: 7px; background: color-mix(in srgb, var(--bg-soft) 80%, transparent); }
+.flow-symbol { display: grid; flex: 0 0 36px; place-items: center; width: 36px; height: 36px; border-radius: 8px; background: color-mix(in srgb, var(--cyan) 10%, transparent); color: var(--cyan); font-size: 18px; }
+.flow-node small { display: block; margin-bottom: 2px; color: var(--faint); font: 8px var(--mono); letter-spacing: .1em; }
+.flow-node h3 { margin: 0; font-size: 13px; }
+.flow-node p { margin: 1px 0 0; color: var(--muted); font-size: 9px; }
+.flow-arrow { color: var(--cyan); text-align: center; font-size: 16px; }
+.compat-detail-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 13px; padding-top: 13px; border-top: 1px solid var(--line); }
+.compat-detail-strip > div { display: grid; gap: 4px; min-width: 0; }
+.compat-detail-strip span { color: var(--faint); font: 8px var(--mono); letter-spacing: .09em; }
+.compat-detail-strip b { color: var(--muted); font-size: 10px; font-weight: 500; }
+.compat-detail-strip code { font-size: 10px; }
+.compat-caveat { display: flex; align-items: flex-start; gap: 8px; margin: 14px 0 0; color: var(--muted); font-size: 10px; line-height: 1.65; }
+.compat-caveat .status-dot { flex: 0 0 6px; width: 6px; height: 6px; margin-top: 6px; }
+.compat-caveat a { color: var(--cyan); text-decoration: underline; text-underline-offset: 3px; }
+.compatibility-page .doc-next { max-width: 1020px; margin: 0 auto 65px; }
+
+@media (max-width: 760px) {
+  .compat-hero { padding: 34px 0 27px; }
+  .compat-section { padding: 33px 0; }
+  .compat-section-heading { align-items: flex-start; flex-direction: column; gap: 9px; margin-bottom: 16px; }
+  .compat-section-heading > p { max-width: 510px; }
+  .compat-ready-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+  .compat-device-card { grid-column: auto; grid-row: auto; min-height: 220px; }
+  .compat-app-card { min-height: 220px; }
+  .compat-technical { margin-top: 0; padding: 21px; }
+  .compat-flow { grid-template-columns: 1fr; gap: 6px; }
+  .flow-node { padding: 10px 13px; }
+  .flow-arrow { transform: rotate(90deg); line-height: 1; }
+  .compat-detail-strip { grid-template-columns: 1fr; gap: 9px; }
+  .compat-detail-strip > div { grid-template-columns: minmax(105px, .6fr) 1.4fr; align-items: center; }
+}
+@media (max-width: 430px) {
+  .compat-hero h1 { font-size: 49px; }
+  .compat-ready-grid { gap: 9px; }
+  .compat-device-card { min-height: 220px; padding: 16px; }
+  .compat-app-card { min-height: 220px; padding: 13px; }
+  .compat-app-card h3 { font-size: 14px; }
+  .compat-app-card p { font-size: 9px; }
+  .compat-install-link { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .compat-technical { padding: 17px; }
+}
+
+
+/* Animated signals give the compatibility diagram a little network life. */
+.compat-device-card, .compat-app-card, .flow-node { transition: transform .3s cubic-bezier(.2,.7,.2,1), border-color .3s, box-shadow .3s; }
+.compat-device-card > *, .compat-app-card > * { position: relative; z-index: 1; }
+.compat-device-card::after, .compat-app-card::after { z-index: 0; content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(240px circle at var(--pointer-x, 50%) var(--pointer-y, 50%), color-mix(in srgb, var(--cyan) 12%, transparent), transparent 72%); transition: opacity .25s; }
+.compat-device-card:hover::after, .compat-app-card:hover::after { opacity: 1; }
+.compat-device-card:hover, .compat-app-card:hover { box-shadow: 0 16px 38px color-mix(in srgb, var(--cyan) 9%, transparent); }
+.chip-generations span { transition: transform .25s, background .25s, border-color .25s; }
+.compat-device-card:hover .chip-generations span { transform: translateY(-3px); border-color: color-mix(in srgb, var(--cyan) 55%, var(--line)); }
+.compat-device-card:hover .chip-generations span:nth-child(2) { transition-delay: .04s; }
+.compat-device-card:hover .chip-generations span:nth-child(3) { transition-delay: .08s; }
+.compat-device-card:hover .chip-generations span:nth-child(4) { transition-delay: .12s; }
+.compat-device-card:hover .chip-generations span:nth-child(5) { transition-delay: .16s; }
+.compat-app-card:hover .compat-app-icon { animation: iconBounce .55s cubic-bezier(.2,.7,.2,1); }
+.compat-flow .flow-arrow { animation: signalBlink 2s ease-in-out infinite; }
+.compat-flow .flow-arrow:nth-of-type(2) { animation-delay: .65s; }
+.flow-symbol { transition: transform .35s cubic-bezier(.2,.7,.2,1), background .35s; }
+.flow-node:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--cyan) 42%, var(--line)); }
+.flow-node:hover .flow-symbol { transform: rotate(-8deg) scale(1.08); background: color-mix(in srgb, var(--cyan) 18%, transparent); }
+@keyframes iconBounce { 45% { transform: translateY(-5px) scale(1.08); } }
+@keyframes signalBlink { 0%,100% { opacity: .45; } 50% { opacity: 1; text-shadow: 0 0 12px var(--cyan); } }
