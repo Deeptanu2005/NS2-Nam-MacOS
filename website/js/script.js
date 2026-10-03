@@ -60,9 +60,22 @@
   if (themeButton) {
     themeButton.addEventListener('click', () => {
       const next = root.dataset.theme === 'light' ? 'dark' : 'light';
-      root.dataset.theme = next;
-      try { localStorage.setItem('ns2nam-theme', next); } catch (_) {}
-      themeButton.setAttribute('aria-label', `Switch to ${next === 'light' ? 'dark' : 'light'} theme`);
+      const applyTheme = () => {
+        root.dataset.theme = next;
+        const themeColor = document.querySelector('meta[name="theme-color"]');
+        if (themeColor) themeColor.content = next === 'light' ? '#f4f8f9' : '#081018';
+        try { localStorage.setItem('ns2nam-theme', next); } catch (_) {}
+        themeButton.setAttribute('aria-label', `Switch to ${next === 'light' ? 'dark' : 'light'} theme`);
+      };
+
+      if (!reduceMotion.matches && document.startViewTransition) {
+        const bounds = themeButton.getBoundingClientRect();
+        root.style.setProperty('--theme-origin-x', `${bounds.left + bounds.width / 2}px`);
+        root.style.setProperty('--theme-origin-y', `${bounds.top + bounds.height / 2}px`);
+        document.startViewTransition(applyTheme);
+      } else {
+        applyTheme();
+      }
     });
   }
 
