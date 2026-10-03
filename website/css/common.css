@@ -54,18 +54,17 @@
 }
 ::view-transition-old(root) { animation: none; }
 ::view-transition-new(root) {
-  animation: theme-reveal 1.2s cubic-bezier(.2, .75, .25, 1) both;
+  animation:
+    theme-reveal 1.2s cubic-bezier(.2, .75, .25, 1) both,
+    theme-unblur .9s cubic-bezier(.4, 0, .2, 1) both;
 }
 @keyframes theme-reveal {
-  from {
-    clip-path: circle(0 at var(--theme-origin-x, 50%) var(--theme-origin-y, 50%));
-    filter: blur(5px);
-  }
-  68% { filter: blur(1.5px); }
-  to {
-    clip-path: circle(150vmax at var(--theme-origin-x, 50%) var(--theme-origin-y, 50%));
-    filter: blur(0);
-  }
+  from { clip-path: circle(0 at var(--theme-origin-x, 50%) var(--theme-origin-y, 50%)); }
+  to { clip-path: circle(150vmax at var(--theme-origin-x, 50%) var(--theme-origin-y, 50%)); }
+}
+@keyframes theme-unblur {
+  from { filter: blur(5px); }
+  to { filter: blur(0); }
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 100px; overflow-x: clip; }
