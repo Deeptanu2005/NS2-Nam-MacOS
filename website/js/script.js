@@ -3,6 +3,23 @@
   root.classList.add('js');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+  // A lightweight cursor accent for mouse and trackpad users.
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotion.matches) {
+    const cursor = document.createElement('div');
+    cursor.className = 'cursor-aura';
+    cursor.setAttribute('aria-hidden', 'true');
+    cursor.innerHTML = '<span class="cursor-aura-ring"></span><span class="cursor-aura-dot"></span>';
+    document.body.appendChild(cursor);
+    window.addEventListener('pointermove', event => {
+      cursor.style.setProperty('--cursor-x', `${event.clientX}px`);
+      cursor.style.setProperty('--cursor-y', `${event.clientY}px`);
+      cursor.classList.add('is-visible');
+      cursor.classList.toggle('is-over-link', Boolean(event.target.closest('a, button, summary, input')));
+    }, { passive: true });
+    document.addEventListener('pointerleave', () => cursor.classList.remove('is-visible'));
+    document.addEventListener('pointerenter', () => cursor.classList.add('is-visible'));
+  }
+
   // Let the BMC popup auto-open only on the first page of a tab session.
   const supportSeenKey = 'ns2nam-bmc-auto-opened-v2';
   let supportWasShown = false;
@@ -222,121 +239,6 @@
     }
   }
 
-  // Client-side FAQ filtering keeps the page static and indexable.
-  const faqSearch = document.querySelector('#faq-search');
-  const faqItems = [...document.querySelectorAll('.faq-item')];
-  if (faqItems.length) {
-    faqItems.forEach(item => {
-      const summary = item.querySelector('summary');
-      const answer = item.querySelector('.faq-answer');
-      if (!summary || !answer) return;
-      const inner = document.createElement('div');
-      inner.className = 'faq-answer-inner';
-      while (answer.firstChild) inner.appendChild(answer.firstChild);
-      answer.appendChild(inner);
-      if (item.open) item.classList.add('is-expanded');
-      summary.setAttribute('aria-expanded', String(item.open));
-      summary.addEventListener('click', event => {
-        event.preventDefault();
-        const opening = summary.getAttribute('aria-expanded') !== 'true';
-        const transitionId = (item._faqTransitionId || 0) + 1;
-        item._faqTransitionId = transitionId;
-        summary.setAttribute('aria-expanded', String(opening));
-        if (item._faqCloseTimer) window.clearTimeout(item._faqCloseTimer);
-        if (opening) {
-          item.open = true;
-          answer.getBoundingClientRect();
-          requestAnimationFrame(() => {
-            if (item._faqTransitionId === transitionId) item.classList.add('is-expanded');
-          });
-          return;
-        }
-        item.classList.remove('is-expanded');
-        const finishClose = () => {
-          if (item._faqTransitionId === transitionId) item.open = false;
-        };
-        const onTransitionEnd = transitionEvent => {
-          if (transitionEvent.target !== answer || transitionEvent.propertyName !== 'grid-template-rows') return;
-          answer.removeEventListener('transitionend', onTransitionEnd);
-          window.clearTimeout(item._faqCloseTimer);
-          finishClose();
-        };
-        answer.addEventListener('transitionend', onTransitionEnd);
-        item._faqCloseTimer = window.setTimeout(() => {
-          answer.removeEventListener('transitionend', onTransitionEnd);
-          finishClose();
-        }, reduceMotion.matches ? 0 : 520);
-      });
-    });
-  }
-
-  if (faqSearch && faqItems.length) {
-    const count = document.querySelector('[data-faq-count]');
-    const empty = document.querySelector('.faq-empty');
-    faqSearch.addEventListener('input', () => {
-      const query = faqSearch.value.trim().toLowerCase();
-      let visible = 0;
-      faqItems.forEach(item => {
-        const match = !query || `${item.textContent} ${item.dataset.keywords || ''}`.toLowerCase().includes(query);
-        item.hidden = !match;
-        if (match) visible += 1;
-      });
-      if (count) count.textContent = String(visible).padStart(2, '0');
-      if (empty) empty.hidden = visible !== 0;
-    });
-  }
-
-  // Quiet particle field in the landing-page hero; paused for reduced motion.
-  const canvas = document.querySelector('.network-canvas');
-  if (canvas && !reduceMotion.matches) {
-    const context = canvas.getContext('2d');
-    if (context) {
-      let width = 0, height = 0, particles = [], frame = 0, running = true;
-      const resize = () => {
-        const rect = canvas.getBoundingClientRect();
-        const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-        width = rect.width; height = rect.height;
-        canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
-        context.setTransform(dpr, 0, 0, dpr, 0, 0);
-        const count = Math.min(50, Math.max(20, Math.floor(width / 23)));
-        particles = Array.from({ length: count }, () => ({
-          x: Math.random() * width, y: Math.random() * height,
-          vx: (Math.random() - .5) * .18, vy: (Math.random() - .5) * .15,
-          r: Math.random() * 1.4 + .4
-        }));
-      };
-      const draw = () => {
-        if (!running) return;
-        context.clearRect(0, 0, width, height);
-        const light = root.dataset.theme === 'light';
-        const point = light ? '37, 110, 128' : '125, 207, 223';
-        for (let i = 0; i < particles.length; i += 1) {
-          const p = particles[i];
-          p.x += p.vx; p.y += p.vy;
-          if (p.x < 0 || p.x > width) p.vx *= -1;
-          if (p.y < 0 || p.y > height) p.vy *= -1;
-          context.beginPath(); context.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-          context.fillStyle = `rgba(${point}, .58)`; context.fill();
-          for (let j = i + 1; j < particles.length; j += 1) {
-            const q = particles[j];
-            const dx = p.x - q.x, dy = p.y - q.y, distance = Math.hypot(dx, dy);
-            if (distance < 115) {
-              context.beginPath(); context.moveTo(p.x, p.y); context.lineTo(q.x, q.y);
-              context.strokeStyle = `rgba(${point}, ${(1 - distance / 115) * .13})`;
-              context.lineWidth = .6; context.stroke();
-            }
-          }
-        }
-        frame = requestAnimationFrame(draw);
-      };
-      resize(); draw();
-      window.addEventListener('resize', resize, { passive: true });
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden) { running = false; cancelAnimationFrame(frame); }
-        else if (!running) { running = true; draw(); }
-      });
-    }
-  }
 
   if (reduceMotion.matches) document.querySelectorAll('svg').forEach(svg => {
     if (typeof svg.pauseAnimations === 'function') svg.pauseAnimations();
