@@ -2,6 +2,8 @@
 
 Run NS-2 (Network Simulator 2) and NAM (Network Animator) on modern Apple Silicon Macs without manually compiling the legacy software on ARM.
 
+**Website:** [NS2-Nam for macOS](https://deeptanu2005.github.io/NS2-Nam-MacOS/)
+
 <img width="1774" height="887" alt="EA64F7E2-C41C-4D69-A30E-593BC2769E4E" src="https://github.com/user-attachments/assets/099bdbe4-b4a7-4f11-9828-ea7913e15ea1" />
 
 ## Requirements
