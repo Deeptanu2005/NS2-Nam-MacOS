@@ -148,6 +148,8 @@
       const recipes = {
         button: [480, 690, .065, .018, 'triangle'],
         toggle: [390, 760, .085, .022, 'sine'],
+        'switch-on': [430, 920, .12, .018, 'sine'],
+        'switch-off': [760, 360, .13, .016, 'triangle'],
         menu: [340, 610, .095, .02, 'sine'],
         theme: [290, 880, .12, .023, 'sine'],
         navigation: [520, 680, .06, .017, 'triangle'],
@@ -342,6 +344,7 @@
     if (!root.classList.contains('sounds-off')) {
       try { sessionStorage.setItem('ns2nam-audio-activated', '1'); } catch (_) {}
     }
+    if (control.matches('.display-option[data-preference]')) return;
     const kind = control.matches('[data-preference], [role="switch"], input[type="checkbox"], input[type="radio"], input[type="color"]')
       ? 'toggle'
       : control.matches('.display-options-toggle, .menu-toggle')
@@ -418,15 +421,15 @@
         </section>
         <section class="display-options-group" aria-labelledby="display-sound-heading">
           <h3 id="display-sound-heading">Sound</h3>
-          <button class="display-option" type="button" role="switch" data-preference="sounds-off" aria-checked="false"><span class="display-option-copy"><b>Turn off sounds</b><small>Mute interface sounds for this session.</small></span><span class="display-switch" aria-hidden="true"></span></button>
+          <button class="display-option" type="button" role="switch" data-preference="sounds-off" aria-checked="false"><span class="display-option-copy"><b>Turn off sounds</b><small>Mute interface sounds for this session.</small></span><span class="display-switch" aria-hidden="true"><span class="display-switch-sheen"></span></span></button>
         </section>
         <section class="display-options-group" aria-labelledby="display-motion-heading">
           <h3 id="display-motion-heading">Motion</h3>
-          <button class="display-option" type="button" role="switch" data-preference="animations-off" aria-checked="false"><span class="display-option-copy"><b>Turn off animations</b><small>Reduce motion and visual effects for smoother performance.</small></span><span class="display-switch" aria-hidden="true"></span></button>
+          <button class="display-option" type="button" role="switch" data-preference="animations-off" aria-checked="false"><span class="display-option-copy"><b>Turn off animations</b><small>Reduce motion and visual effects for smoother performance.</small></span><span class="display-switch" aria-hidden="true"><span class="display-switch-sheen"></span></span></button>
         </section>
         <section class="display-options-group" aria-labelledby="display-visibility-heading">
           <h3 id="display-visibility-heading">Visibility</h3>
-          <button class="display-option" type="button" role="switch" data-preference="high-contrast" aria-checked="false"><span class="display-option-copy"><b>High contrast</b><small>Strengthen text and panel contrast for visibility.</small></span><span class="display-switch" aria-hidden="true"></span></button>
+          <button class="display-option" type="button" role="switch" data-preference="high-contrast" aria-checked="false"><span class="display-option-copy"><b>High contrast</b><small>Strengthen text and panel contrast for visibility.</small></span><span class="display-switch" aria-hidden="true"><span class="display-switch-sheen"></span></span></button>
         </section>
       </section>`;
     navActions.append(displayOptions);
@@ -668,6 +671,11 @@
         const preferenceKey = preference === 'sounds-off' ? 'ns2nam-mute-interface-sounds-v2' : `ns2nam-${preference}`;
         try { sessionStorage.setItem(preferenceKey, enabled ? '1' : '0'); } catch (_) {}
         syncOptions();
+        option.classList.remove('swipe-on', 'swipe-off');
+        void option.offsetWidth;
+        option.classList.add(enabled ? 'swipe-on' : 'swipe-off');
+        window.clearTimeout(option.swipeTimer);
+        option.swipeTimer = window.setTimeout(() => option.classList.remove('swipe-on', 'swipe-off'), 650);
         if (preference === 'animations-off') {
           if (enabled) {
             document.querySelectorAll('.glow-card').forEach(card => {
@@ -684,9 +692,9 @@
           if (enabled && uiAudioContext) uiAudioContext.suspend().catch(() => {});
           else if (!enabled) {
             try { sessionStorage.setItem('ns2nam-audio-activated', '1'); } catch (_) {}
-            playUiSound('toggle');
           }
         }
+        playUiSound(enabled ? 'switch-on' : 'switch-off');
       });
     });
     document.addEventListener('pointerdown', event => {
