@@ -24,11 +24,16 @@
           r: Math.random() * 1.4 + .4
         }));
       };
+      const colorToRgb = color => {
+        const hex = color.trim().match(/^#([\da-f]{6})$/i)?.[1];
+        if (!hex) return '125, 207, 223';
+        return [0, 2, 4].map(offset => parseInt(hex.slice(offset, offset + 2), 16)).join(', ');
+      };
       const draw = () => {
         if (!running) return;
         context.clearRect(0, 0, width, height);
-        const light = root.dataset.theme === 'light';
-        const point = light ? '37, 110, 128' : '125, 207, 223';
+        const point = colorToRgb(getComputedStyle(root).getPropertyValue('--cyan'));
+        const link = colorToRgb(getComputedStyle(root).getPropertyValue('--blue'));
         for (let i = 0; i < particles.length; i += 1) {
           const p = particles[i];
           p.x += p.vx; p.y += p.vy;
@@ -41,7 +46,7 @@
             const dx = p.x - q.x, dy = p.y - q.y, distance = Math.hypot(dx, dy);
             if (distance < 115) {
               context.beginPath(); context.moveTo(p.x, p.y); context.lineTo(q.x, q.y);
-              context.strokeStyle = `rgba(${point}, ${(1 - distance / 115) * .13})`;
+              context.strokeStyle = `rgba(${link}, ${(1 - distance / 115) * .13})`;
               context.lineWidth = .6; context.stroke();
             }
           }

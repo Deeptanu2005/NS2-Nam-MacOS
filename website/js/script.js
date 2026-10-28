@@ -2,7 +2,126 @@
   const root = document.documentElement;
   root.classList.add('js');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const interactiveSelector = 'button, a[href], summary, [role="button"], [role="switch"], input[type="checkbox"], input[type="radio"], select';
+  const accentPalettes = {
+    aqua: { dark: ['#72e4dc', '#67a8ff', '#b297ff'], light: ['#087d78', '#276dd3', '#6846cf'] },
+    blue: { dark: ['#89baff', '#79a4ff', '#bba7ff'], light: ['#145cb8', '#2451b8', '#563fb4'] },
+    violet: { dark: ['#c6a5ff', '#9e8dff', '#e1a3ff'], light: ['#7045b5', '#5545bd', '#9f3eb3'] },
+    amber: { dark: ['#ffd083', '#ffad5f', '#ff8f8f'], light: ['#925100', '#b44d00', '#b8334c'] },
+    rose: { dark: ['#ff9fb7', '#ff8dbb', '#c19cff'], light: ['#ad315d', '#b12e76', '#693eb0'] },
+  };
+  const validCustomAccent = value => /^#[\da-f]{6}$/i.test(value || '');
+  const pickerLimits = { minSaturation: .3, maxSaturation: 1, minValue: .52, maxValue: .96 };
+  const readAccentCookie = () => {
+    const entry = document.cookie.split('; ').find(cookie => cookie.startsWith('ns2nam-accent='));
+    if (!entry) return null;
+    try { return decodeURIComponent(entry.slice('ns2nam-accent='.length)); } catch (_) { return null; }
+  };
+  const writeAccentCookie = accent => {
+    const secure = location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `ns2nam-accent=${encodeURIComponent(accent)}; Max-Age=31536000; Path=/; SameSite=Lax${secure}`;
+  };
+  const hexToHsl = hex => {
+    const values = hex.slice(1).match(/.{2}/g).map(part => parseInt(part, 16) / 255);
+    const max = Math.max(...values), min = Math.min(...values), delta = max - min;
+    let hue = 0;
+    const lightness = (max + min) / 2;
+    const saturation = delta === 0 ? 0 : delta / (1 - Math.abs(2 * lightness - 1));
+    if (delta) {
+      if (max === values[0]) hue = ((values[1] - values[2]) / delta) % 6;
+      else if (max === values[1]) hue = (values[2] - values[0]) / delta + 2;
+      else hue = (values[0] - values[1]) / delta + 4;
+      hue *= 60;
+    }
+    return [((hue + 360) % 360), saturation, lightness];
+  };
+  const hslToHex = (hue, saturation, lightness) => {
+    const chroma = (1 - Math.abs(2 * lightness - 1)) * saturation;
+    const section = ((hue % 360) + 360) % 360 / 60;
+    const secondary = chroma * (1 - Math.abs(section % 2 - 1));
+    const [red, green, blue] = section < 1 ? [chroma, secondary, 0]
+      : section < 2 ? [secondary, chroma, 0]
+      : section < 3 ? [0, chroma, secondary]
+      : section < 4 ? [0, secondary, chroma]
+      : section < 5 ? [secondary, 0, chroma] : [chroma, 0, secondary];
+    const match = lightness - chroma / 2;
+    return `#${[red, green, blue].map(value => Math.round((value + match) * 255).toString(16).padStart(2, '0')).join('')}`;
+  };
+  const hslToHsv = (hue, saturation, lightness) => {
+    const value = lightness + saturation * Math.min(lightness, 1 - lightness);
+    return [hue, value === 0 ? 0 : 2 * (1 - lightness / value), value];
+  };
+  const constrainPickerHsv = ([hue, saturation, value], fallbackHue = 215) => [
+    Number.isFinite(hue) ? (hue + 360) % 360 : fallbackHue,
+    Math.max(pickerLimits.minSaturation, Math.min(pickerLimits.maxSaturation, saturation)),
+    Math.max(pickerLimits.minValue, Math.min(pickerLimits.maxValue, value)),
+  ];
+  const hsvToHex = (hue, saturation, value) => {
+    const lightness = value * (1 - saturation / 2);
+    const hslSaturation = lightness === 0 || lightness === 1 ? 0 : (value - lightness) / Math.min(lightness, 1 - lightness);
+    return hslToHex(hue, hslSaturation, lightness);
+  };
+  const customAccentPalette = (hex, light) => {
+    const [hue, saturation, lightness] = hexToHsl(hex);
+    const sat = Math.max(.58, saturation);
+    const tone = light ? Math.max(.34, Math.min(.46, lightness)) : Math.max(.66, Math.min(.78, lightness));
+    return [hslToHex(hue, Math.min(.92, Math.max(sat, .72)), tone),
+      hslToHex(hue + 28, Math.min(.9, Math.max(sat * .9, .66)), tone),
+      hslToHex(hue - 32, Math.min(.88, Math.max(sat * .82, .62)), tone)];
+  };
+  let activeAccent = 'blue';
+  let cookieAccent = null;
+  try {
+    cookieAccent = readAccentCookie();
+  } catch (_) {}
+  if (accentPalettes[cookieAccent] || validCustomAccent(cookieAccent)) activeAccent = cookieAccent;
+  else {
+    try {
+      const legacyAccent = localStorage.getItem('ns2nam-accent');
+      if (accentPalettes[legacyAccent] || validCustomAccent(legacyAccent)) {
+        activeAccent = legacyAccent;
+        writeAccentCookie(legacyAccent);
+      }
+    } catch (_) {}
+  }
+  if (validCustomAccent(activeAccent)) {
+    const [hue, saturation, lightness] = hexToHsl(activeAccent);
+    const [, hsvSaturation, value] = hslToHsv(hue, saturation, lightness);
+    if (hsvSaturation < pickerLimits.minSaturation || value < pickerLimits.minValue || value > pickerLimits.maxValue) {
+      activeAccent = 'blue';
+      writeAccentCookie(activeAccent);
+      try { localStorage.setItem('ns2nam-accent', activeAccent); } catch (_) {}
+    }
+  }
+  const applySiteAccent = (accent = activeAccent, persist = false) => {
+    activeAccent = accentPalettes[accent] || validCustomAccent(accent) ? accent : 'aqua';
+    const colors = accentPalettes[activeAccent]
+      ? accentPalettes[activeAccent][root.dataset.theme === 'light' ? 'light' : 'dark']
+      : customAccentPalette(activeAccent, root.dataset.theme === 'light');
+    ['--cyan', '--blue', '--violet'].forEach((variable, index) => root.style.setProperty(variable, colors[index]));
+    root.style.setProperty('--accent-soft', `color-mix(in srgb, ${colors[0]} 16%, transparent)`);
+    root.style.setProperty('--accent-border', `color-mix(in srgb, ${colors[0]} 34%, var(--line-strong))`);
+    if (root.classList.contains('high-contrast')) {
+      ['--bg', '--bg-soft', '--panel', '--panel-solid', '--panel-light', '--ambient-a', '--ambient-b'].forEach(variable => root.style.removeProperty(variable));
+    } else {
+      const light = root.dataset.theme === 'light';
+      root.style.setProperty('--bg', `color-mix(in srgb, ${light ? '#f4f8f9' : '#081018'} ${light ? '97%' : '94%'}, ${colors[0]} ${light ? '3%' : '6%'})`);
+      root.style.setProperty('--bg-soft', `color-mix(in srgb, ${light ? '#e8f0f2' : '#0c1620'} ${light ? '94%' : '90%'}, ${colors[0]} ${light ? '6%' : '10%'})`);
+      root.style.setProperty('--panel-solid', `color-mix(in srgb, ${light ? '#ffffff' : '#101d29'} 96%, ${colors[0]})`);
+      root.style.setProperty('--panel', `color-mix(in srgb, ${light ? 'rgba(255,255,255,.83)' : 'rgba(16,29,41,.82)'} 96%, ${colors[0]})`);
+      root.style.setProperty('--panel-light', `color-mix(in srgb, ${light ? '#f3f8f8' : '#132331'} 95%, ${colors[0]})`);
+      root.style.setProperty('--ambient-a', `color-mix(in srgb, ${colors[0]} 18%, transparent)`);
+      root.style.setProperty('--ambient-b', `color-mix(in srgb, ${colors[2]} 14%, transparent)`);
+    }
+    root.dataset.accent = accentPalettes[activeAccent] ? activeAccent : 'custom';
+    const themeColor = document.querySelector('meta[name="theme-color"]');
+    if (themeColor) themeColor.content = getComputedStyle(root).getPropertyValue('--bg').trim();
+    root.dispatchEvent(new Event('site:accentchange'));
+    if (persist) {
+      writeAccentCookie(activeAccent);
+      try { localStorage.setItem('ns2nam-accent', activeAccent); } catch (_) {}
+    }
+  };
+  const interactiveSelector = 'button, a[href], summary, [role="button"], [role="switch"], input[type="checkbox"], input[type="radio"], input[type="color"], select';
   let uiAudioContext;
   let uiNoiseBuffer;
   const getUiAudioContext = () => {
@@ -223,7 +342,7 @@
     if (!root.classList.contains('sounds-off')) {
       try { sessionStorage.setItem('ns2nam-audio-activated', '1'); } catch (_) {}
     }
-    const kind = control.matches('[data-preference], [role="switch"], input[type="checkbox"], input[type="radio"]')
+    const kind = control.matches('[data-preference], [role="switch"], input[type="checkbox"], input[type="radio"], input[type="color"]')
       ? 'toggle'
       : control.matches('.display-options-toggle, .menu-toggle')
         ? 'menu'
@@ -242,17 +361,61 @@
   root.classList.toggle('animations-off', readSessionPreference('ns2nam-animations-off'));
   root.classList.toggle('high-contrast', readSessionPreference('ns2nam-high-contrast'));
   root.classList.toggle('sounds-off', readSessionPreference('ns2nam-mute-interface-sounds-v2'));
+  const siteHeader = document.querySelector('.site-header');
+  const navShell = siteHeader?.querySelector('.nav-shell');
+  const navActions = siteHeader?.querySelector('.nav-actions');
+  let navReturnTimer;
+  const updateFloatingNav = () => {
+    if (!siteHeader) return;
+    const isFloating = siteHeader.classList.contains('is-floating');
+    // Use separate enter/exit points so slow scrolling near the boundary cannot chatter the animation.
+    const shouldFloat = isFloating ? window.scrollY > 96 : window.scrollY > 160;
+    const detachActions = shouldFloat && window.matchMedia('(min-width: 981px)').matches;
+    const actionsParent = detachActions ? siteHeader : navShell;
+    if (navActions && actionsParent && navActions.parentElement !== actionsParent) actionsParent.append(navActions);
+    if (shouldFloat === isFloating) return;
+    clearTimeout(navReturnTimer);
+    siteHeader.classList.remove('is-unfloating');
+    siteHeader.classList.toggle('is-floating', shouldFloat);
+    if (!shouldFloat) {
+      siteHeader.classList.add('is-unfloating');
+      navReturnTimer = setTimeout(() => siteHeader.classList.remove('is-unfloating'), 650);
+    }
+  };
+  updateFloatingNav();
+  window.addEventListener('scroll', updateFloatingNav, { passive: true });
+  window.addEventListener('resize', updateFloatingNav, { passive: true });
   if (!root.classList.contains('sounds-off') && readSessionPreference('ns2nam-audio-activated')) {
     try { getUiAudioContext()?.resume().catch(() => {}); } catch (_) {}
   }
 
-  const navActions = document.querySelector('.nav-actions');
   if (navActions) {
     const displayOptions = document.createElement('div');
     displayOptions.className = 'display-options';
     displayOptions.innerHTML = `<button class="display-options-toggle" type="button" aria-label="Open options" aria-expanded="false" aria-controls="display-options-panel" title="Options"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h14"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="18" r="2"/></svg></button>
       <section class="display-options-panel" id="display-options-panel" aria-label="Options" hidden>
         <h2>Options</h2>
+        <section class="display-options-group display-theme-group" aria-labelledby="display-theme-heading">
+          <h3 id="display-theme-heading">Theme color</h3>
+          <div class="theme-color-controls">
+            <div class="accent-swatches" role="group" aria-label="Preset theme colors">
+              <button class="accent-swatch" type="button" data-accent-choice="aqua" aria-label="Aqua theme color" title="Aqua" style="--swatch-color:#25bfb4"><span></span></button>
+              <button class="accent-swatch" type="button" data-accent-choice="blue" aria-label="Blue theme color" title="Blue" style="--swatch-color:#4d82e8"><span></span></button>
+              <button class="accent-swatch" type="button" data-accent-choice="violet" aria-label="Violet theme color" title="Violet" style="--swatch-color:#9a66df"><span></span></button>
+              <button class="accent-swatch" type="button" data-accent-choice="amber" aria-label="Amber theme color" title="Amber" style="--swatch-color:#d98a32"><span></span></button>
+              <button class="accent-swatch" type="button" data-accent-choice="rose" aria-label="Rose theme color" title="Rose" style="--swatch-color:#df5c88"><span></span></button>
+            </div>
+            <div class="custom-color-picker">
+              <button class="custom-picker-trigger" type="button" aria-expanded="false" aria-controls="custom-picker-popover"><span class="custom-picker-swatch"></span><span>Custom color</span><code class="custom-accent-value">#89BAFF</code><span class="custom-picker-chevron" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="m2.5 4.5 3.5 3 3.5-3"/></svg></span></button>
+              <div class="custom-picker-popover" id="custom-picker-popover" hidden>
+                <div class="custom-picker-field" role="slider" tabindex="0" aria-label="Color saturation and brightness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span class="custom-picker-thumb"></span></div>
+                <label class="custom-picker-hue"><span>HUE</span><input class="custom-picker-hue-input" type="range" min="0" max="359" value="215" aria-label="Color hue"></label>
+                <div class="custom-picker-footer"><span class="custom-picker-preview"></span><label for="custom-picker-hex">HEX<input id="custom-picker-hex" class="custom-picker-hex" type="text" value="#89BAFF" maxlength="7" spellcheck="false" aria-label="Hex color value"></label></div>
+              </div>
+            </div>
+          </div>
+          <p class="theme-color-note">Tints accents and page background.</p>
+        </section>
         <section class="display-options-group" aria-labelledby="display-sound-heading">
           <h3 id="display-sound-heading">Sound</h3>
           <button class="display-option" type="button" role="switch" data-preference="sounds-off" aria-checked="false"><span class="display-option-copy"><b>Turn off sounds</b><small>Mute interface sounds for this session.</small></span><span class="display-switch" aria-hidden="true"></span></button>
@@ -269,6 +432,7 @@
     navActions.append(displayOptions);
     const trigger = displayOptions.querySelector('.display-options-toggle');
     const panel = displayOptions.querySelector('.display-options-panel');
+    let closeCustomPicker = null;
     let closeTimer;
     const setOpen = open => {
       const currentlyOpen = trigger.getAttribute('aria-expanded') === 'true';
@@ -282,6 +446,7 @@
           if (trigger.getAttribute('aria-expanded') === 'true') panel.classList.add('is-open');
         });
       } else {
+        closeCustomPicker?.();
         panel.classList.remove('is-open');
         if (root.classList.contains('animations-off') || reduceMotion.matches) {
           panel.classList.remove('is-closing');
@@ -296,12 +461,202 @@
       }
       trigger.setAttribute('aria-expanded', String(open));
       trigger.setAttribute('aria-label', open ? 'Close options' : 'Open options');
+      root.classList.toggle('options-overlay-open', open || root.classList.contains('options-picker-open'));
     };
     const syncOptions = () => {
       displayOptions.querySelectorAll('[data-preference]').forEach(option => {
         option.setAttribute('aria-checked', String(root.classList.contains(option.dataset.preference)));
       });
     };
+    const pickerTrigger = displayOptions.querySelector('.custom-picker-trigger');
+    const pickerPopover = displayOptions.querySelector('.custom-picker-popover');
+    const customColorPicker = displayOptions.querySelector('.custom-color-picker');
+    const pickerField = displayOptions.querySelector('.custom-picker-field');
+    const pickerHue = displayOptions.querySelector('.custom-picker-hue-input');
+    const pickerHex = displayOptions.querySelector('.custom-picker-hex');
+    const pickerSwatch = displayOptions.querySelector('.custom-picker-swatch');
+    const pickerPreview = displayOptions.querySelector('.custom-picker-preview');
+    const accentValue = displayOptions.querySelector('.custom-accent-value');
+    const accentSwatches = [...displayOptions.querySelectorAll('[data-accent-choice]')];
+    let pickerHsv = [215, .65, 1];
+    let pickerCloseTimer;
+    const positionFloatingPicker = () => {
+      const anchor = pickerTrigger.getBoundingClientRect();
+      const width = Math.min(320, window.innerWidth - 24);
+      const height = Math.max(pickerPopover.scrollHeight, 270);
+      const left = Math.max(12, Math.min(window.innerWidth - width - 12, anchor.right - width));
+      let top = anchor.bottom + 10;
+      if (top + height > window.innerHeight - 12) top = Math.max(12, anchor.top - height - 10);
+      pickerPopover.style.left = `${left}px`;
+      pickerPopover.style.top = `${top}px`;
+      pickerPopover.style.width = `${width}px`;
+      pickerPopover.style.setProperty('--picker-origin-x', `${Math.max(8, Math.min(92, ((anchor.right - left) / width) * 100))}%`);
+      pickerPopover.style.setProperty('--picker-origin-y', top >= anchor.bottom ? '0%' : '100%');
+    };
+    const blockOutsideClickThrough = event => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      let expiryTimer;
+      const swallowClick = clickEvent => {
+        clickEvent.preventDefault();
+        clickEvent.stopImmediatePropagation();
+        clearTimeout(expiryTimer);
+        document.removeEventListener('click', swallowClick, true);
+      };
+      document.addEventListener('click', swallowClick, true);
+      expiryTimer = window.setTimeout(() => document.removeEventListener('click', swallowClick, true), 700);
+    };
+    const onPickerOutsidePointer = event => {
+      if (pickerPopover.contains(event.target) || pickerTrigger.contains(event.target)) return;
+      const insideMenu = displayOptions.contains(event.target);
+      closeCustomPicker?.();
+      if (!insideMenu) setOpen(false);
+      blockOutsideClickThrough(event);
+    };
+    const onPickerEscape = event => {
+      if (event.key === 'Escape' && pickerTrigger.getAttribute('aria-expanded') === 'true') {
+        event.stopImmediatePropagation();
+        closeCustomPicker?.();
+        pickerTrigger.focus();
+      }
+    };
+    const detachFloatingPickerEvents = () => {
+      document.removeEventListener('pointerdown', onPickerOutsidePointer, true);
+      document.removeEventListener('keydown', onPickerEscape, true);
+      document.removeEventListener('scroll', positionFloatingPicker, true);
+      window.removeEventListener('resize', positionFloatingPicker);
+    };
+    const finishFloatingPickerClose = () => {
+      pickerPopover.hidden = true;
+      pickerPopover.classList.remove('is-closing', 'is-open');
+      pickerPopover.removeAttribute('style');
+      customColorPicker.append(pickerPopover);
+    };
+    closeCustomPicker = () => {
+      if (pickerTrigger.getAttribute('aria-expanded') !== 'true') return;
+      clearTimeout(pickerCloseTimer);
+      pickerTrigger.setAttribute('aria-expanded', 'false');
+      root.classList.remove('options-picker-open');
+      root.classList.toggle('options-overlay-open', trigger.getAttribute('aria-expanded') === 'true');
+      pickerPopover.classList.remove('is-open');
+      detachFloatingPickerEvents();
+      if (root.classList.contains('animations-off') || reduceMotion.matches) finishFloatingPickerClose();
+      else {
+        pickerPopover.classList.add('is-closing');
+        pickerCloseTimer = window.setTimeout(finishFloatingPickerClose, 440);
+      }
+    };
+    const setPickerColor = (hex, persist = false) => {
+      if (!validCustomAccent(hex)) return;
+      const [hue, saturation, lightness] = hexToHsl(hex);
+      const nextHsv = hslToHsv(hue, saturation, lightness);
+      const visibleHue = nextHsv[1] < pickerLimits.minSaturation ? pickerHsv[0] : hue;
+      pickerHsv = constrainPickerHsv([visibleHue, nextHsv[1], nextHsv[2]], pickerHsv[0]);
+      const normalizedHex = hsvToHex(...pickerHsv);
+      pickerHue.value = String(Math.round(pickerHsv[0]));
+      pickerField.style.setProperty('--picker-hue', `${pickerHsv[0]}deg`);
+      pickerHue.style.setProperty('--picker-hue', `${pickerHsv[0]}deg`);
+      pickerField.style.setProperty('--picker-x', `${((pickerHsv[1] - pickerLimits.minSaturation) / (pickerLimits.maxSaturation - pickerLimits.minSaturation)) * 100}%`);
+      pickerField.style.setProperty('--picker-y', `${((pickerLimits.maxValue - pickerHsv[2]) / (pickerLimits.maxValue - pickerLimits.minValue)) * 100}%`);
+      pickerField.setAttribute('aria-valuenow', String(Math.round(pickerHsv[1] * 100)));
+      pickerField.setAttribute('aria-valuetext', `${normalizedHex.toUpperCase()}, saturation ${Math.round(pickerHsv[1] * 100)}%, brightness ${Math.round(pickerHsv[2] * 100)}%`);
+      pickerHex.value = normalizedHex.toUpperCase();
+      pickerSwatch.style.backgroundColor = normalizedHex;
+      pickerPreview.style.backgroundColor = normalizedHex;
+      applySiteAccent(normalizedHex, persist);
+    };
+    const syncAccentControls = () => {
+      accentSwatches.forEach(swatch => swatch.setAttribute('aria-pressed', String(swatch.dataset.accentChoice === activeAccent)));
+      const selected = validCustomAccent(activeAccent) ? activeAccent : accentPalettes[activeAccent][root.dataset.theme === 'light' ? 'light' : 'dark'][0];
+      const [hue, saturation, lightness] = hexToHsl(selected);
+      const nextHsv = hslToHsv(hue, saturation, lightness);
+      const visibleHue = nextHsv[1] < pickerLimits.minSaturation ? pickerHsv[0] : hue;
+      pickerHsv = constrainPickerHsv([visibleHue, nextHsv[1], nextHsv[2]], pickerHsv[0]);
+      pickerHue.value = String(Math.round(pickerHsv[0]));
+      pickerField.style.setProperty('--picker-hue', `${pickerHsv[0]}deg`);
+      pickerHue.style.setProperty('--picker-hue', `${pickerHsv[0]}deg`);
+      pickerField.style.setProperty('--picker-x', `${((pickerHsv[1] - pickerLimits.minSaturation) / (pickerLimits.maxSaturation - pickerLimits.minSaturation)) * 100}%`);
+      pickerField.style.setProperty('--picker-y', `${((pickerLimits.maxValue - pickerHsv[2]) / (pickerLimits.maxValue - pickerLimits.minValue)) * 100}%`);
+      pickerField.setAttribute('aria-valuenow', String(Math.round(pickerHsv[1] * 100)));
+      pickerField.setAttribute('aria-valuetext', `${selected.toUpperCase()}, saturation ${Math.round(pickerHsv[1] * 100)}%, brightness ${Math.round(pickerHsv[2] * 100)}%`);
+      pickerHex.value = selected.toUpperCase();
+      pickerSwatch.style.backgroundColor = selected;
+      pickerPreview.style.backgroundColor = selected;
+      if (accentValue) accentValue.textContent = selected.toUpperCase();
+    };
+    root.addEventListener('site:accentchange', syncAccentControls);
+    applySiteAccent();
+    syncAccentControls();
+    if (window.matchMedia('(min-width: 761px) and (hover: hover) and (pointer: fine)').matches) {
+      accentSwatches.forEach(swatch => swatch.addEventListener('click', () => {
+        applySiteAccent(swatch.dataset.accentChoice, true);
+        syncAccentControls();
+        playUiSound('toggle');
+      }));
+      pickerTrigger.addEventListener('click', () => {
+        const open = pickerTrigger.getAttribute('aria-expanded') !== 'true';
+        clearTimeout(pickerCloseTimer);
+        if (open) {
+          pickerTrigger.setAttribute('aria-expanded', 'true');
+          root.classList.add('options-picker-open', 'options-overlay-open');
+          document.body.append(pickerPopover);
+          pickerPopover.hidden = false;
+          pickerPopover.classList.remove('is-closing');
+          positionFloatingPicker();
+          requestAnimationFrame(() => pickerPopover.classList.add('is-open'));
+          document.addEventListener('pointerdown', onPickerOutsidePointer, true);
+          document.addEventListener('keydown', onPickerEscape, true);
+          document.addEventListener('scroll', positionFloatingPicker, true);
+          window.addEventListener('resize', positionFloatingPicker);
+        } else {
+          closeCustomPicker();
+        }
+      });
+      const updateFieldFromPointer = event => {
+        const bounds = pickerField.getBoundingClientRect();
+        const x = Math.max(0, Math.min(1, (event.clientX - bounds.left) / bounds.width));
+        const y = Math.max(0, Math.min(1, (event.clientY - bounds.top) / bounds.height));
+        pickerHsv[1] = pickerLimits.minSaturation + x * (pickerLimits.maxSaturation - pickerLimits.minSaturation);
+        pickerHsv[2] = pickerLimits.maxValue - y * (pickerLimits.maxValue - pickerLimits.minValue);
+        setPickerColor(hsvToHex(...pickerHsv));
+      };
+      pickerField.addEventListener('pointerdown', event => {
+        event.preventDefault();
+        pickerField.setPointerCapture(event.pointerId);
+        updateFieldFromPointer(event);
+      });
+      pickerField.addEventListener('pointermove', event => {
+        if (pickerField.hasPointerCapture(event.pointerId)) updateFieldFromPointer(event);
+      });
+      pickerField.addEventListener('pointerup', () => applySiteAccent(hsvToHex(...pickerHsv), true));
+      pickerField.addEventListener('pointercancel', () => applySiteAccent(hsvToHex(...pickerHsv), true));
+      pickerField.addEventListener('keydown', event => {
+        const step = event.shiftKey ? .1 : .02;
+        if (event.key === 'ArrowLeft') pickerHsv[1] = Math.max(0, pickerHsv[1] - step);
+        else if (event.key === 'ArrowRight') pickerHsv[1] = Math.min(1, pickerHsv[1] + step);
+        else if (event.key === 'ArrowUp') pickerHsv[2] = Math.min(1, pickerHsv[2] + step);
+        else if (event.key === 'ArrowDown') pickerHsv[2] = Math.max(0, pickerHsv[2] - step);
+        else return;
+        event.preventDefault();
+        setPickerColor(hsvToHex(...pickerHsv), true);
+      });
+      pickerHue.addEventListener('input', () => {
+        pickerHsv[0] = Number(pickerHue.value);
+        pickerField.style.setProperty('--picker-hue', `${pickerHsv[0]}deg`);
+        pickerHue.style.setProperty('--picker-hue', `${pickerHsv[0]}deg`);
+        setPickerColor(hsvToHex(...pickerHsv));
+      });
+      pickerHue.addEventListener('change', () => applySiteAccent(hsvToHex(...pickerHsv), true));
+      pickerHex.addEventListener('input', () => {
+        const hex = pickerHex.value.startsWith('#') ? pickerHex.value : `#${pickerHex.value}`;
+        if (validCustomAccent(hex)) setPickerColor(hex);
+      });
+      pickerHex.addEventListener('change', () => {
+        const hex = pickerHex.value.startsWith('#') ? pickerHex.value : `#${pickerHex.value}`;
+        if (validCustomAccent(hex)) setPickerColor(hex, true);
+        else syncAccentControls();
+      });
+    }
     syncOptions();
     trigger.addEventListener('click', () => setOpen(trigger.getAttribute('aria-expanded') !== 'true'));
     displayOptions.querySelectorAll('[data-preference]').forEach(option => {
@@ -309,6 +664,7 @@
         const preference = option.dataset.preference;
         const enabled = !root.classList.contains(preference);
         root.classList.toggle(preference, enabled);
+        if (preference === 'high-contrast') applySiteAccent();
         const preferenceKey = preference === 'sounds-off' ? 'ns2nam-mute-interface-sounds-v2' : `ns2nam-${preference}`;
         try { sessionStorage.setItem(preferenceKey, enabled ? '1' : '0'); } catch (_) {}
         syncOptions();
@@ -334,8 +690,10 @@
       });
     });
     document.addEventListener('pointerdown', event => {
-      if (!displayOptions.contains(event.target)) setOpen(false);
-    });
+      if (panel.hidden || displayOptions.contains(event.target) || pickerPopover.contains(event.target)) return;
+      setOpen(false);
+      blockOutsideClickThrough(event);
+    }, true);
     document.addEventListener('keydown', event => {
       if (event.key === 'Escape' && !panel.hidden) {
         setOpen(false);
@@ -398,6 +756,7 @@
   let savedTheme = null;
   try { savedTheme = localStorage.getItem('ns2nam-theme'); } catch (_) {}
   if (savedTheme === 'light' || savedTheme === 'dark') root.dataset.theme = savedTheme;
+  applySiteAccent();
   if (themeButton) {
     themeButton.innerHTML = '<svg class="theme-glyph" viewBox="0 0 40 40" aria-hidden="true"><g class="theme-rays"><path d="M20 2v5M20 33v5M2 20h5M33 20h5M7.3 7.3l3.5 3.5m18.4 18.4 3.5 3.5m0-25.4-3.5 3.5m-18.4 18.4-3.5 3.5"/></g><circle class="theme-sun" cx="20" cy="20" r="7"/><path class="theme-moon" d="M27.8 7.1A14.2 14.2 0 1 0 32.9 27.8 12 12 0 0 1 27.8 7.1Z"/><path class="torch-handle" d="m20 24-3 13h6l-3-13Z"/><path class="torch-flame" d="M20 3c-4 5 2 8-3 13-4 4-5 8-2 12 2 3 8 4 11 0 4-5 1-10-2-13-1-2-2-4-1-7-2 2-3 4-3 6-3-3 1-7 0-11Z"/></svg><span class="theme-smoke" aria-hidden="true"><i></i><i></i><i></i></span>';
     const syncThemeLabel = () => {
@@ -412,8 +771,7 @@
       playCandleClickSound(next);
       const applyTheme = () => {
         root.dataset.theme = next;
-        const themeColor = document.querySelector('meta[name="theme-color"]');
-        if (themeColor) themeColor.content = next === 'light' ? '#f4f8f9' : '#081018';
+        applySiteAccent();
         try { localStorage.setItem('ns2nam-theme', next); } catch (_) {}
         syncThemeLabel();
         if (next === 'dark' && !reduceMotion.matches && !root.classList.contains('animations-off')) {
