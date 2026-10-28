@@ -166,23 +166,46 @@
     revealItems.forEach(item => item.classList.add('is-visible'));
   }
 
-  // Move the card's soft network glow with the pointer on precise-input devices.
+  // Keep the card glow moving with the pointer across each card group.
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotion.matches) {
-    document.querySelectorAll('.feature-card, .compat-device-card, .compat-app-card').forEach(card => {
-      card.addEventListener('pointermove', event => {
-        const bounds = card.getBoundingClientRect();
-        card.style.setProperty('--pointer-x', `${event.clientX - bounds.left}px`);
-        card.style.setProperty('--pointer-y', `${event.clientY - bounds.top}px`);
-        const px = (event.clientX - bounds.left) / bounds.width;
-        const py = (event.clientY - bounds.top) / bounds.height;
-        card.style.setProperty('--tilt-x', `${((.5 - py) * 3).toFixed(2)}deg`);
-        card.style.setProperty('--tilt-y', `${((px - .5) * 4).toFixed(2)}deg`);
-      });
-      card.addEventListener('pointerleave', () => {
-        card.style.removeProperty('--pointer-x');
-        card.style.removeProperty('--pointer-y');
-        card.style.removeProperty('--tilt-x');
-        card.style.removeProperty('--tilt-y');
+    const glowGroups = [
+      ['.feature-grid', '.feature-card'],
+      ['.compat-ready-grid', '.compat-device-card, .compat-app-card'],
+      ['.requirements-grid', '.requirement-card'],
+      ['.credits-grid', '.credit-card'],
+      ['.compat-stack', '.compat-layer'],
+      ['.faq-list', '.faq-item'],
+    ];
+    glowGroups.forEach(([groupSelector, cardSelector]) => {
+      document.querySelectorAll(groupSelector).forEach(grid => {
+        const cards = [...grid.querySelectorAll(cardSelector)];
+        cards.forEach(card => card.classList.add('glow-card'));
+        window.addEventListener('pointermove', event => {
+          const gridBounds = grid.getBoundingClientRect();
+          const trackingMargin = 180;
+          const nearGrid = event.clientX >= gridBounds.left - trackingMargin
+            && event.clientX <= gridBounds.right + trackingMargin
+            && event.clientY >= gridBounds.top - trackingMargin
+            && event.clientY <= gridBounds.bottom + trackingMargin;
+          cards.forEach(card => {
+            const bounds = card.getBoundingClientRect();
+            card.style.setProperty('--pointer-x', `${event.clientX - bounds.left}px`);
+            card.style.setProperty('--pointer-y', `${event.clientY - bounds.top}px`);
+            card.style.setProperty('--glow-active', nearGrid ? '1' : '0');
+            card.style.removeProperty('--tilt-x');
+            card.style.removeProperty('--tilt-y');
+          });
+          const card = event.target.closest(cardSelector);
+          if (nearGrid && card && grid.contains(card)) {
+            const bounds = card.getBoundingClientRect();
+            const px = (event.clientX - bounds.left) / bounds.width;
+            const py = (event.clientY - bounds.top) / bounds.height;
+            if (card.matches('.feature-card, .compat-device-card')) {
+              card.style.setProperty('--tilt-x', `${((.5 - py) * 3).toFixed(2)}deg`);
+              card.style.setProperty('--tilt-y', `${((px - .5) * 4).toFixed(2)}deg`);
+            }
+          }
+        });
       });
     });
   }

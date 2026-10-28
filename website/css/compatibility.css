@@ -86,8 +86,7 @@
 /* Animated signals give the compatibility diagram a little network life. */
 .compat-device-card, .compat-app-card, .flow-node { transition: transform .3s cubic-bezier(.2,.7,.2,1), border-color .3s, box-shadow .3s; }
 .compat-device-card > *, .compat-app-card > * { position: relative; z-index: 1; }
-.compat-device-card::after, .compat-app-card::after { z-index: 0; content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(240px circle at var(--pointer-x, 50%) var(--pointer-y, 50%), color-mix(in srgb, var(--cyan) 12%, transparent), transparent 72%); transition: opacity .25s; }
-.compat-device-card:hover::after, .compat-app-card:hover::after { opacity: 1; }
+.compat-device-card::after, .compat-app-card::after { z-index: 0; content: ''; position: absolute; inset: 0; pointer-events: none; opacity: var(--glow-active, 0); background: radial-gradient(360px circle at var(--pointer-x, 50%) var(--pointer-y, 50%), color-mix(in srgb, var(--cyan) 13%, transparent), transparent 70%); transition: opacity .3s; }
 .compat-device-card:hover, .compat-app-card:hover { box-shadow: 0 16px 38px color-mix(in srgb, var(--cyan) 9%, transparent); }
 .chip-generations span { transition: transform .25s, background .25s, border-color .25s; }
 .compat-device-card:hover .chip-generations span { transform: translateY(-3px); border-color: color-mix(in srgb, var(--cyan) 55%, var(--line)); }
