@@ -4,7 +4,7 @@ Run NS-2 (Network Simulator 2) and NAM (Network Animator) on modern Apple Silico
 
 **Website:** [NS2-Nam for macOS](https://deeptanu2005.github.io/NS2-Nam-MacOS/)
 
-<img width="1774" height="887" alt="EA64F7E2-C41C-4D69-A30E-593BC2769E4E" src="https://github.com/user-attachments/assets/099bdbe4-b4a7-4f11-9828-ea7913e15ea1" />
+<img width="1774" height="887" alt="NS2-NAM for macOS" src="website/images/github_poster.png" />
 
 ## Requirements
 
@@ -85,7 +85,7 @@ Inside the Docker environment, this directory is available at:
 NS-2 and NAM run using the `linux/amd64` architecture through Docker, allowing the environment to work on Apple Silicon Macs.
 
 <!-- <img width="1774" height="887" alt="FBF42041-D77A-49E1-9881-6C1E23E50B85" src="https://github.com/user-attachments/assets/4ff3e3ca-2591-4644-8c08-7da7ff39d806" /> -->
-<img width="1774" height="887" alt="ACBE0F5A-DA86-49AA-B251-03D3DAE7CBBB" src="https://github.com/user-attachments/assets/14f0e0c8-e497-4553-8451-496876af1640" />
+<img width="1774" height="887" alt="Run NAM on mac" src="website/images/mac_chips_dark.png" />
 
 See the [compatibility notes](docs/COMPATIBILITY.md) for platform details and
 known limitations.

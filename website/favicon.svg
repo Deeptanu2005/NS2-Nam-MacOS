@@ -1,10 +1,38 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="16" fill="#081018"/>
-  <g fill="none" stroke="#72e4dc" stroke-width="3">
-    <path d="M17 17 46 30 20 48 46 30"/>
-    <circle cx="17" cy="17" r="6" fill="#081018"/>
-    <circle cx="46" cy="30" r="6" fill="#081018"/>
-    <circle cx="20" cy="48" r="6" fill="#081018"/>
+  <defs>
+    <linearGradient id="link" x1="15" y1="16" x2="49" y2="48" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9acaff"/>
+      <stop offset="1" stop-color="#5797ff"/>
+    </linearGradient>
+    <linearGradient id="node" x1="16" y1="17" x2="32" y2="48" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#b6dcff"/>
+      <stop offset="1" stop-color="#5797ff"/>
+    </linearGradient>
+    <filter id="softGlow" x="-80%" y="-80%" width="260%" height="260%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="2.2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="brightGlow" x="-120%" y="-120%" width="340%" height="340%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="3.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="64" height="64" rx="15" fill="#0a1018"/>
+  <g transform="translate(32 32) scale(1.12) translate(-32 -32)">
+  <g transform="translate(.35 .35)" fill="none" stroke="url(#link)" stroke-linecap="round" stroke-width="1.6" stroke-dasharray="4.8 2.8">
+    <path d="m25 21 19 11m-19 11 19-11"/>
   </g>
-  <circle cx="46" cy="30" r="2" fill="#b297ff"/>
+  <g transform="translate(.35 .35)" fill="#0a1018" stroke="url(#node)" stroke-width="3.5" filter="url(#softGlow)">
+    <circle cx="20" cy="21" r="7.5" filter="url(#brightGlow)"/>
+    <circle cx="20" cy="43" r="6.8"/>
+    <circle cx="44" cy="32" r="6.8"/>
+  </g>
+  </g>
 </svg>
