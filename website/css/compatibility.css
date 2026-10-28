@@ -91,6 +91,13 @@
 .chip-generations span { transition: transform .25s, background .25s, border-color .25s; }
 .compat-device-card:hover .chip-generations span { transform: translateY(-3px); border-color: color-mix(in srgb, var(--cyan) 55%, var(--line)); }
 .compat-device-card:hover .chip-generations span:nth-child(2) { transition-delay: .04s; }
+
+/* Match the shared rounded surfaces defined in common.css. */
+.compat-device-card,
+.compat-app-card,
+.compat-technical,
+.flow-node { border-radius: 20px; }
+.compat-install-link { border-radius: 14px; }
 .compat-device-card:hover .chip-generations span:nth-child(3) { transition-delay: .08s; }
 .compat-device-card:hover .chip-generations span:nth-child(4) { transition-delay: .12s; }
 .compat-device-card:hover .chip-generations span:nth-child(5) { transition-delay: .16s; }

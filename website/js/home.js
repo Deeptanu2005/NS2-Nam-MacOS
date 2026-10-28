@@ -3,10 +3,11 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   // Quiet particle field in the landing-page hero; paused for reduced motion.
   const canvas = document.querySelector('.network-canvas');
-  if (canvas && !reduceMotion.matches) {
+  if (canvas) {
     const context = canvas.getContext('2d');
     if (context) {
-      let width = 0, height = 0, particles = [], frame = 0, running = true;
+      let width = 0, height = 0, particles = [], frame = 0, running = false;
+      const motionAllowed = () => !reduceMotion.matches && !root.classList.contains('animations-off');
       const resize = () => {
         const rect = canvas.getBoundingClientRect();
         const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -44,11 +45,19 @@
         }
         frame = requestAnimationFrame(draw);
       };
-      resize(); draw();
+      const start = () => {
+        if (!running && motionAllowed()) { running = true; draw(); }
+      };
+      const stop = () => {
+        if (running) { running = false; cancelAnimationFrame(frame); }
+      };
+      resize(); start();
       window.addEventListener('resize', resize, { passive: true });
+      document.addEventListener('site:motionchange', () => motionAllowed() ? start() : stop());
+      reduceMotion.addEventListener('change', () => motionAllowed() ? start() : stop());
       document.addEventListener('visibilitychange', () => {
-        if (document.hidden) { running = false; cancelAnimationFrame(frame); }
-        else if (!running) { running = true; draw(); }
+        if (document.hidden) stop();
+        else start();
       });
     }
   }

@@ -2,9 +2,86 @@
   const root = document.documentElement;
   root.classList.add('js');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const readSessionPreference = key => {
+    try { return sessionStorage.getItem(key) === '1'; } catch (_) { return false; }
+  };
+  root.classList.toggle('animations-off', readSessionPreference('ns2nam-animations-off'));
+  root.classList.toggle('high-contrast', readSessionPreference('ns2nam-high-contrast'));
+
+  const navActions = document.querySelector('.nav-actions');
+  if (navActions) {
+    const displayOptions = document.createElement('div');
+    displayOptions.className = 'display-options';
+    displayOptions.innerHTML = '<button class="display-options-toggle" type="button" aria-label="Open display options" aria-expanded="false" aria-controls="display-options-panel" title="Display options"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h14"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="18" r="2"/></svg></button><section class="display-options-panel" id="display-options-panel" aria-label="Display options" hidden><h2>Display options</h2><button class="display-option" type="button" role="switch" data-preference="animations-off" aria-checked="false"><span class="display-option-copy"><b>Turn off animations</b><small>Reduce motion and visual effects for smoother performance.</small></span><span class="display-switch" aria-hidden="true"></span></button><button class="display-option" type="button" role="switch" data-preference="high-contrast" aria-checked="false"><span class="display-option-copy"><b>High contrast</b><small>Strengthen text and panel contrast for visibility.</small></span><span class="display-switch" aria-hidden="true"></span></button></section>';
+    navActions.append(displayOptions);
+    const trigger = displayOptions.querySelector('.display-options-toggle');
+    const panel = displayOptions.querySelector('.display-options-panel');
+    let closeTimer;
+    const setOpen = open => {
+      window.clearTimeout(closeTimer);
+      if (open) {
+        panel.hidden = false;
+        panel.classList.remove('is-closing');
+        requestAnimationFrame(() => {
+          if (trigger.getAttribute('aria-expanded') === 'true') panel.classList.add('is-open');
+        });
+      } else {
+        panel.classList.remove('is-open');
+        if (root.classList.contains('animations-off') || reduceMotion.matches) {
+          panel.classList.remove('is-closing');
+          panel.hidden = true;
+        } else {
+          panel.classList.add('is-closing');
+          closeTimer = window.setTimeout(() => {
+            panel.hidden = true;
+            panel.classList.remove('is-closing');
+          }, 440);
+        }
+      }
+      trigger.setAttribute('aria-expanded', String(open));
+      trigger.setAttribute('aria-label', open ? 'Close display options' : 'Open display options');
+    };
+    const syncOptions = () => {
+      displayOptions.querySelectorAll('[data-preference]').forEach(option => {
+        option.setAttribute('aria-checked', String(root.classList.contains(option.dataset.preference)));
+      });
+    };
+    syncOptions();
+    trigger.addEventListener('click', () => setOpen(trigger.getAttribute('aria-expanded') !== 'true'));
+    displayOptions.querySelectorAll('[data-preference]').forEach(option => {
+      option.addEventListener('click', () => {
+        const preference = option.dataset.preference;
+        const enabled = !root.classList.contains(preference);
+        root.classList.toggle(preference, enabled);
+        try { sessionStorage.setItem(`ns2nam-${preference}`, enabled ? '1' : '0'); } catch (_) {}
+        syncOptions();
+        if (preference === 'animations-off') {
+          if (enabled) {
+            document.querySelectorAll('.glow-card').forEach(card => {
+              card.style.removeProperty('--pointer-x');
+              card.style.removeProperty('--pointer-y');
+              card.style.removeProperty('--glow-active');
+              card.style.removeProperty('--tilt-x');
+              card.style.removeProperty('--tilt-y');
+            });
+          }
+          document.dispatchEvent(new CustomEvent('site:motionchange', { detail: { animationsOff: enabled } }));
+        }
+      });
+    });
+    document.addEventListener('pointerdown', event => {
+      if (!displayOptions.contains(event.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && !panel.hidden) {
+        setOpen(false);
+        trigger.focus();
+      }
+    });
+  }
 
   // A lightweight cursor accent for mouse and trackpad users.
-  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotion.matches) {
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotion.matches && !root.classList.contains('animations-off')) {
     const cursor = document.createElement('div');
     cursor.className = 'cursor-aura';
     cursor.setAttribute('aria-hidden', 'true');
@@ -58,24 +135,68 @@
   try { savedTheme = localStorage.getItem('ns2nam-theme'); } catch (_) {}
   if (savedTheme === 'light' || savedTheme === 'dark') root.dataset.theme = savedTheme;
   if (themeButton) {
+    themeButton.innerHTML = '<svg class="theme-glyph" viewBox="0 0 40 40" aria-hidden="true"><g class="theme-rays"><path d="M20 2v5M20 33v5M2 20h5M33 20h5M7.3 7.3l3.5 3.5m18.4 18.4 3.5 3.5m0-25.4-3.5 3.5m-18.4 18.4-3.5 3.5"/></g><circle class="theme-sun" cx="20" cy="20" r="7"/><path class="theme-moon" d="M27.8 7.1A14.2 14.2 0 1 0 32.9 27.8 12 12 0 0 1 27.8 7.1Z"/><path class="torch-handle" d="m20 24-3 13h6l-3-13Z"/><path class="torch-flame" d="M20 3c-4 5 2 8-3 13-4 4-5 8-2 12 2 3 8 4 11 0 4-5 1-10-2-13-1-2-2-4-1-7-2 2-3 4-3 6-3-3 1-7 0-11Z"/></svg><span class="theme-smoke" aria-hidden="true"><i></i><i></i><i></i></span>';
+    const syncThemeLabel = () => {
+      const target = root.dataset.theme === 'light' ? 'dark' : 'light';
+      themeButton.setAttribute('aria-label', `Switch to ${target} theme`);
+      themeButton.title = `Switch to ${target} theme`;
+    };
+    syncThemeLabel();
     themeButton.addEventListener('click', () => {
+      if (themeButton.disabled) return;
       const next = root.dataset.theme === 'light' ? 'dark' : 'light';
       const applyTheme = () => {
         root.dataset.theme = next;
         const themeColor = document.querySelector('meta[name="theme-color"]');
         if (themeColor) themeColor.content = next === 'light' ? '#f4f8f9' : '#081018';
         try { localStorage.setItem('ns2nam-theme', next); } catch (_) {}
-        themeButton.setAttribute('aria-label', `Switch to ${next === 'light' ? 'dark' : 'light'} theme`);
+        syncThemeLabel();
+        if (next === 'dark' && !reduceMotion.matches && !root.classList.contains('animations-off')) {
+          const smoke = themeButton.querySelector('.theme-smoke');
+          smoke.classList.add('is-rising');
+          window.setTimeout(() => smoke.classList.remove('is-rising'), 1000);
+        }
       };
 
-      if (!reduceMotion.matches && document.startViewTransition) {
-        const bounds = themeButton.getBoundingClientRect();
-        root.style.setProperty('--theme-origin-x', `${bounds.left + bounds.width / 2}px`);
-        root.style.setProperty('--theme-origin-y', `${bounds.top + bounds.height / 2}px`);
-        document.startViewTransition(applyTheme);
-      } else {
+      if (reduceMotion.matches || root.classList.contains('animations-off')) {
         applyTheme();
+        return;
       }
+
+      const bounds = themeButton.getBoundingClientRect();
+      root.style.setProperty('--theme-origin-x', `${bounds.left + bounds.width / 2}px`);
+      root.style.setProperty('--theme-origin-y', `${bounds.top + bounds.height / 2}px`);
+      themeButton.disabled = true;
+      const runTorch = (direction, done) => {
+        root.classList.add('theme-torching');
+        root.classList.toggle('theme-torch-reversing', direction === 'dark');
+        const torchWash = document.createElement('div');
+        torchWash.className = `torch-wash torch-to-${direction}`;
+        torchWash.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(torchWash);
+        window.setTimeout(() => {
+          torchWash.remove();
+          root.classList.remove('theme-torching', 'theme-torch-reversing');
+          done();
+        }, 720);
+      };
+      const runThemeReveal = done => {
+        const finishReveal = () => {
+          done();
+        };
+        if (document.startViewTransition) {
+          const transition = document.startViewTransition({
+            update: applyTheme,
+            types: [`theme-${next}`],
+          });
+          transition.finished.then(finishReveal, finishReveal);
+        } else {
+          applyTheme();
+          finishReveal();
+        }
+      };
+
+      runTorch(next, () => runThemeReveal(() => { themeButton.disabled = false; }));
     });
   }
 
@@ -129,7 +250,7 @@
       const rail = active.link.closest('.toc-links');
       if (rail) {
         const targetLeft = active.link.offsetLeft - rail.offsetLeft - (rail.clientWidth - active.link.clientWidth) / 2;
-        rail.scrollTo({ left: targetLeft, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+        rail.scrollTo({ left: targetLeft, behavior: reduceMotion.matches || root.classList.contains('animations-off') ? 'auto' : 'smooth' });
       }
     }
     previousActiveTocEntry = active;
@@ -152,7 +273,7 @@
   document.querySelectorAll('[data-year]').forEach(node => { node.textContent = new Date().getFullYear(); });
 
   const revealItems = document.querySelectorAll('.reveal');
-  if ('IntersectionObserver' in window && !reduceMotion.matches) {
+  if ('IntersectionObserver' in window && !reduceMotion.matches && !root.classList.contains('animations-off')) {
     const revealObserver = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -167,7 +288,7 @@
   }
 
   // Keep the card glow moving with the pointer across each card group.
-  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotion.matches) {
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotion.matches && !root.classList.contains('animations-off')) {
     const glowGroups = [
       ['.feature-grid', '.feature-card'],
       ['.compat-ready-grid', '.compat-device-card, .compat-app-card'],
@@ -181,6 +302,7 @@
         const cards = [...grid.querySelectorAll(cardSelector)];
         cards.forEach(card => card.classList.add('glow-card'));
         window.addEventListener('pointermove', event => {
+          if (root.classList.contains('animations-off')) return;
           const gridBounds = grid.getBoundingClientRect();
           const trackingMargin = 180;
           const nearGrid = event.clientX >= gridBounds.left - trackingMargin
