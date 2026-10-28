@@ -1,4 +1,6 @@
 (() => {
+  window.__ns2HomeCleanup?.();
+  window.__ns2HomeCleanup = null;
   const root = document.documentElement;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   // Quiet particle field in the landing-page hero; paused for reduced motion.
@@ -6,6 +8,7 @@
   if (canvas) {
     const context = canvas.getContext('2d');
     if (context) {
+      const controller = new AbortController();
       let width = 0, height = 0, particles = [], frame = 0, running = false;
       const motionAllowed = () => !reduceMotion.matches && !root.classList.contains('animations-off');
       const resize = () => {
@@ -52,13 +55,14 @@
         if (running) { running = false; cancelAnimationFrame(frame); }
       };
       resize(); start();
-      window.addEventListener('resize', resize, { passive: true });
-      document.addEventListener('site:motionchange', () => motionAllowed() ? start() : stop());
-      reduceMotion.addEventListener('change', () => motionAllowed() ? start() : stop());
+      window.addEventListener('resize', resize, { passive: true, signal: controller.signal });
+      document.addEventListener('site:motionchange', () => motionAllowed() ? start() : stop(), { signal: controller.signal });
+      reduceMotion.addEventListener('change', () => motionAllowed() ? start() : stop(), { signal: controller.signal });
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) stop();
         else start();
-      });
+      }, { signal: controller.signal });
+      window.__ns2HomeCleanup = () => { stop(); controller.abort(); };
     }
   }
 })();

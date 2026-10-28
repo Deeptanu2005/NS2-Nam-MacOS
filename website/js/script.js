@@ -2,23 +2,279 @@
   const root = document.documentElement;
   root.classList.add('js');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const interactiveSelector = 'button, a[href], summary, [role="button"], [role="switch"], input[type="checkbox"], input[type="radio"], select';
+  let uiAudioContext;
+  let uiNoiseBuffer;
+  const getUiAudioContext = () => {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return null;
+    if (!uiAudioContext) uiAudioContext = new AudioContext();
+    if (uiAudioContext.state !== 'running') uiAudioContext.resume().catch(() => {});
+    return uiAudioContext;
+  };
+  const getUiNoiseBuffer = context => {
+    if (uiNoiseBuffer) return uiNoiseBuffer;
+    const length = Math.ceil(context.sampleRate * .8);
+    uiNoiseBuffer = context.createBuffer(1, length, context.sampleRate);
+    const samples = uiNoiseBuffer.getChannelData(0);
+    for (let i = 0; i < length; i += 1) samples[i] = Math.random() * 2 - 1;
+    return uiNoiseBuffer;
+  };
+  const playUiSound = kind => {
+    if (root.classList.contains('sounds-off')) return;
+    try {
+      const context = getUiAudioContext();
+      if (!context) return;
+
+      const recipes = {
+        button: [480, 690, .065, .018, 'triangle'],
+        toggle: [390, 760, .085, .022, 'sine'],
+        menu: [340, 610, .095, .02, 'sine'],
+        theme: [290, 880, .12, .023, 'sine'],
+        navigation: [520, 680, .06, .017, 'triangle'],
+        disclosure: [430, 590, .07, .017, 'sine'],
+      };
+      const [startHz, endHz, duration, volume, waveform] = recipes[kind] || recipes.button;
+      const scheduleTone = () => {
+        const now = context.currentTime;
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+        oscillator.type = waveform;
+        oscillator.frequency.setValueAtTime(startHz, now);
+        oscillator.frequency.exponentialRampToValueAtTime(endHz, now + duration * .72);
+        gain.gain.setValueAtTime(.0001, now);
+        gain.gain.exponentialRampToValueAtTime(volume, now + .008);
+        gain.gain.exponentialRampToValueAtTime(.0001, now + duration);
+        oscillator.connect(gain);
+        gain.connect(context.destination);
+        oscillator.start(now);
+        oscillator.stop(now + duration + .01);
+      };
+      if (context.state !== 'running') context.resume().then(scheduleTone).catch(() => {});
+      else scheduleTone();
+    } catch (_) {
+      // Audio is an optional enhancement; controls still work if Web Audio is unavailable.
+    }
+  };
+  const playThemeWhoosh = nextTheme => {
+    if (root.classList.contains('sounds-off')) return;
+    try {
+      const context = getUiAudioContext();
+      if (!context) return;
+      const now = context.currentTime;
+      const noise = getUiNoiseBuffer(context);
+      const lighting = nextTheme === 'light';
+      const whoosh = context.createBufferSource();
+      const filter = context.createBiquadFilter();
+      const gain = context.createGain();
+      whoosh.buffer = noise;
+      filter.type = 'bandpass';
+      filter.Q.setValueAtTime(.55, now);
+      filter.frequency.setValueAtTime(lighting ? 170 : 2100, now);
+      filter.frequency.exponentialRampToValueAtTime(lighting ? 2100 : 170, now + .55);
+      gain.gain.setValueAtTime(.0001, now);
+      gain.gain.exponentialRampToValueAtTime(.032, now + .12);
+      gain.gain.exponentialRampToValueAtTime(.0001, now + .72);
+      whoosh.connect(filter);
+      filter.connect(gain);
+      gain.connect(context.destination);
+      whoosh.start(now);
+      whoosh.stop(now + .74);
+    } catch (_) {
+      // Theme changes work normally if synthesized audio is unavailable.
+    }
+  };
+
+  const playLiquidMenuSound = opening => {
+    if (root.classList.contains('sounds-off')) return;
+    try {
+      const context = getUiAudioContext();
+      if (!context) return;
+      const now = context.currentTime;
+      const delay = context.createDelay(.2);
+      const echo = context.createGain();
+      delay.delayTime.setValueAtTime(.065, now);
+      echo.gain.setValueAtTime(.13, now);
+      delay.connect(echo);
+      echo.connect(context.destination);
+
+      const pitches = opening ? [250, 340, 470] : [470, 340, 250];
+      pitches.forEach((pitch, index) => {
+        const start = now + index * .062;
+        const oscillator = context.createOscillator();
+        const voice = context.createGain();
+        const lowpass = context.createBiquadFilter();
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(pitch, start);
+        oscillator.frequency.exponentialRampToValueAtTime(pitch * (opening ? 1.65 : .64), start + .035);
+        oscillator.frequency.exponentialRampToValueAtTime(pitch * (opening ? .82 : 1.18), start + .082);
+        oscillator.frequency.exponentialRampToValueAtTime(pitch * (opening ? 1.08 : .9), start + .125);
+        oscillator.frequency.exponentialRampToValueAtTime(pitch * .94, start + .17);
+        lowpass.type = 'lowpass';
+        lowpass.frequency.setValueAtTime(1450, start);
+        voice.gain.setValueAtTime(.0001, start);
+        voice.gain.exponentialRampToValueAtTime(.016 - index * .002, start + .009);
+        voice.gain.exponentialRampToValueAtTime(.0001, start + .18);
+        oscillator.connect(lowpass);
+        lowpass.connect(voice);
+        voice.connect(context.destination);
+        voice.connect(delay);
+        oscillator.start(start);
+        oscillator.stop(start + .19);
+      });
+    } catch (_) {
+      // Menu controls remain usable if synthesized audio is unavailable.
+    }
+  };
+
+  const playCandleClickSound = nextTheme => {
+    if (root.classList.contains('sounds-off')) return;
+    try {
+      const context = getUiAudioContext();
+      if (!context) return;
+      const now = context.currentTime;
+      const noise = getUiNoiseBuffer(context);
+      const lighting = nextTheme === 'light';
+
+      const fire = context.createBufferSource();
+      const fireFilter = context.createBiquadFilter();
+      const fireGain = context.createGain();
+      fire.buffer = noise;
+      fireFilter.type = 'lowpass';
+      fireFilter.frequency.setValueAtTime(900, now);
+      fireFilter.frequency.exponentialRampToValueAtTime(lighting ? 1450 : 360, now + (lighting ? .62 : .25));
+      fireGain.gain.setValueAtTime(.0001, now);
+      fireGain.gain.exponentialRampToValueAtTime(lighting ? .012 : .009, now + .045);
+      fireGain.gain.exponentialRampToValueAtTime(.0001, now + (lighting ? .64 : .28));
+      fire.connect(fireFilter);
+      fireFilter.connect(fireGain);
+      fireGain.connect(context.destination);
+      fire.start(now);
+      fire.stop(now + (lighting ? .66 : .3));
+
+      const crackleTimes = lighting ? [.11, .2, .34, .49] : [.035, .105, .18];
+      crackleTimes.forEach((offset, index) => {
+        const start = now + offset;
+        const pop = context.createBufferSource();
+        const popFilter = context.createBiquadFilter();
+        const popGain = context.createGain();
+        pop.buffer = noise;
+        popFilter.type = 'bandpass';
+        popFilter.frequency.setValueAtTime(1900 + Math.random() * 1500, start);
+        popFilter.Q.setValueAtTime(1.1, start);
+        const peak = (lighting ? .009 : .006) * (1 - index / (crackleTimes.length * 1.5));
+        popGain.gain.setValueAtTime(.0001, start);
+        popGain.gain.exponentialRampToValueAtTime(peak, start + .004);
+        popGain.gain.exponentialRampToValueAtTime(.0001, start + .032);
+        pop.connect(popFilter);
+        popFilter.connect(popGain);
+        popGain.connect(context.destination);
+        pop.start(start);
+        pop.stop(start + .04);
+      });
+
+      if (!lighting) {
+        const smoke = context.createBufferSource();
+        const smokeFilter = context.createBiquadFilter();
+        const smokeGain = context.createGain();
+        smoke.buffer = noise;
+        smokeFilter.type = 'highpass';
+        smokeFilter.frequency.setValueAtTime(850, now + .06);
+        smokeFilter.frequency.exponentialRampToValueAtTime(2400, now + .42);
+        smokeGain.gain.setValueAtTime(.0001, now + .06);
+        smokeGain.gain.exponentialRampToValueAtTime(.008, now + .13);
+        smokeGain.gain.exponentialRampToValueAtTime(.0001, now + .44);
+        smoke.connect(smokeFilter);
+        smokeFilter.connect(smokeGain);
+        smokeGain.connect(context.destination);
+        smoke.start(now + .06);
+        smoke.stop(now + .46);
+      }
+    } catch (_) {
+      // Theme changes work normally if synthesized audio is unavailable.
+    }
+  };
+  let audioActivationStored = false;
+  try { audioActivationStored = sessionStorage.getItem('ns2nam-audio-activated') === '1'; } catch (_) {}
+  const unlockAudio = () => {
+    if (root.classList.contains('sounds-off')) return;
+    try {
+      const context = getUiAudioContext();
+      if (context && context.state !== 'running') context.resume().catch(() => {});
+      if (!audioActivationStored) {
+        sessionStorage.setItem('ns2nam-audio-activated', '1');
+        audioActivationStored = true;
+      }
+    } catch (_) {}
+  };
+  document.addEventListener('pointerdown', event => {
+    if (event.button === 0) unlockAudio();
+  }, true);
+  window.addEventListener('wheel', unlockAudio, { capture: true, passive: true });
+  window.addEventListener('touchend', unlockAudio, { capture: true, passive: true });
+  document.addEventListener('keydown', event => {
+    if (!['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].includes(event.key)) return;
+    if (event.target instanceof Element && event.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+    unlockAudio();
+  }, true);
+  document.addEventListener('click', event => {
+    const control = event.target.closest(interactiveSelector);
+    if (!control || control.disabled || control.matches('.display-options-toggle')) return;
+    if (!root.classList.contains('sounds-off')) {
+      try { sessionStorage.setItem('ns2nam-audio-activated', '1'); } catch (_) {}
+    }
+    const kind = control.matches('[data-preference], [role="switch"], input[type="checkbox"], input[type="radio"]')
+      ? 'toggle'
+      : control.matches('.display-options-toggle, .menu-toggle')
+        ? 'menu'
+        : control.matches('.theme-toggle')
+          ? 'theme'
+          : control.matches('summary')
+            ? 'disclosure'
+            : control.matches('a[href]')
+              ? 'navigation'
+              : 'button';
+    playUiSound(kind);
+  }, true);
   const readSessionPreference = key => {
     try { return sessionStorage.getItem(key) === '1'; } catch (_) { return false; }
   };
   root.classList.toggle('animations-off', readSessionPreference('ns2nam-animations-off'));
   root.classList.toggle('high-contrast', readSessionPreference('ns2nam-high-contrast'));
+  root.classList.toggle('sounds-off', readSessionPreference('ns2nam-mute-interface-sounds-v2'));
+  if (!root.classList.contains('sounds-off') && readSessionPreference('ns2nam-audio-activated')) {
+    try { getUiAudioContext()?.resume().catch(() => {}); } catch (_) {}
+  }
 
   const navActions = document.querySelector('.nav-actions');
   if (navActions) {
     const displayOptions = document.createElement('div');
     displayOptions.className = 'display-options';
-    displayOptions.innerHTML = '<button class="display-options-toggle" type="button" aria-label="Open display options" aria-expanded="false" aria-controls="display-options-panel" title="Display options"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h14"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="18" r="2"/></svg></button><section class="display-options-panel" id="display-options-panel" aria-label="Display options" hidden><h2>Display options</h2><button class="display-option" type="button" role="switch" data-preference="animations-off" aria-checked="false"><span class="display-option-copy"><b>Turn off animations</b><small>Reduce motion and visual effects for smoother performance.</small></span><span class="display-switch" aria-hidden="true"></span></button><button class="display-option" type="button" role="switch" data-preference="high-contrast" aria-checked="false"><span class="display-option-copy"><b>High contrast</b><small>Strengthen text and panel contrast for visibility.</small></span><span class="display-switch" aria-hidden="true"></span></button></section>';
+    displayOptions.innerHTML = `<button class="display-options-toggle" type="button" aria-label="Open options" aria-expanded="false" aria-controls="display-options-panel" title="Options"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h14"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="18" r="2"/></svg></button>
+      <section class="display-options-panel" id="display-options-panel" aria-label="Options" hidden>
+        <h2>Options</h2>
+        <section class="display-options-group" aria-labelledby="display-sound-heading">
+          <h3 id="display-sound-heading">Sound</h3>
+          <button class="display-option" type="button" role="switch" data-preference="sounds-off" aria-checked="false"><span class="display-option-copy"><b>Turn off sounds</b><small>Mute interface sounds for this session.</small></span><span class="display-switch" aria-hidden="true"></span></button>
+        </section>
+        <section class="display-options-group" aria-labelledby="display-motion-heading">
+          <h3 id="display-motion-heading">Motion</h3>
+          <button class="display-option" type="button" role="switch" data-preference="animations-off" aria-checked="false"><span class="display-option-copy"><b>Turn off animations</b><small>Reduce motion and visual effects for smoother performance.</small></span><span class="display-switch" aria-hidden="true"></span></button>
+        </section>
+        <section class="display-options-group" aria-labelledby="display-visibility-heading">
+          <h3 id="display-visibility-heading">Visibility</h3>
+          <button class="display-option" type="button" role="switch" data-preference="high-contrast" aria-checked="false"><span class="display-option-copy"><b>High contrast</b><small>Strengthen text and panel contrast for visibility.</small></span><span class="display-switch" aria-hidden="true"></span></button>
+        </section>
+      </section>`;
     navActions.append(displayOptions);
     const trigger = displayOptions.querySelector('.display-options-toggle');
     const panel = displayOptions.querySelector('.display-options-panel');
     let closeTimer;
     const setOpen = open => {
+      const currentlyOpen = trigger.getAttribute('aria-expanded') === 'true';
+      if (open === currentlyOpen) return;
       window.clearTimeout(closeTimer);
+      playLiquidMenuSound(open);
       if (open) {
         panel.hidden = false;
         panel.classList.remove('is-closing');
@@ -39,7 +295,7 @@
         }
       }
       trigger.setAttribute('aria-expanded', String(open));
-      trigger.setAttribute('aria-label', open ? 'Close display options' : 'Open display options');
+      trigger.setAttribute('aria-label', open ? 'Close options' : 'Open options');
     };
     const syncOptions = () => {
       displayOptions.querySelectorAll('[data-preference]').forEach(option => {
@@ -53,7 +309,8 @@
         const preference = option.dataset.preference;
         const enabled = !root.classList.contains(preference);
         root.classList.toggle(preference, enabled);
-        try { sessionStorage.setItem(`ns2nam-${preference}`, enabled ? '1' : '0'); } catch (_) {}
+        const preferenceKey = preference === 'sounds-off' ? 'ns2nam-mute-interface-sounds-v2' : `ns2nam-${preference}`;
+        try { sessionStorage.setItem(preferenceKey, enabled ? '1' : '0'); } catch (_) {}
         syncOptions();
         if (preference === 'animations-off') {
           if (enabled) {
@@ -66,6 +323,13 @@
             });
           }
           document.dispatchEvent(new CustomEvent('site:motionchange', { detail: { animationsOff: enabled } }));
+        }
+        if (preference === 'sounds-off') {
+          if (enabled && uiAudioContext) uiAudioContext.suspend().catch(() => {});
+          else if (!enabled) {
+            try { sessionStorage.setItem('ns2nam-audio-activated', '1'); } catch (_) {}
+            playUiSound('toggle');
+          }
         }
       });
     });
@@ -145,6 +409,7 @@
     themeButton.addEventListener('click', () => {
       if (themeButton.disabled) return;
       const next = root.dataset.theme === 'light' ? 'dark' : 'light';
+      playCandleClickSound(next);
       const applyTheme = () => {
         root.dataset.theme = next;
         const themeColor = document.querySelector('meta[name="theme-color"]');
@@ -168,6 +433,7 @@
       root.style.setProperty('--theme-origin-y', `${bounds.top + bounds.height / 2}px`);
       themeButton.disabled = true;
       const runTorch = (direction, done) => {
+        if (!document.startViewTransition) playThemeWhoosh(direction);
         root.classList.add('theme-torching');
         root.classList.toggle('theme-torch-reversing', direction === 'dark');
         const torchWash = document.createElement('div');
@@ -185,6 +451,7 @@
           done();
         };
         if (document.startViewTransition) {
+          playThemeWhoosh(next);
           const transition = document.startViewTransition({
             update: applyTheme,
             types: [`theme-${next}`],
@@ -223,6 +490,13 @@
     document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMenu(); });
   }
 
+  let pageContentController;
+  let pageRevealObserver;
+  const initializePageContent = () => {
+  if (pageContentController) pageContentController.abort();
+  if (pageRevealObserver) pageRevealObserver.disconnect();
+  pageContentController = new AbortController();
+  const pageSignal = pageContentController.signal;
   // Scroll progress, restrained reveal motion, and current year.
   const meter = document.querySelector('.scroll-meter span');
   const tocEntries = [...document.querySelectorAll('.toc a[href^="#"]')].map(link => ({
@@ -266,23 +540,23 @@
   };
   window.addEventListener('scroll', () => {
     if (!scrollQueued) { scrollQueued = true; requestAnimationFrame(updateScroll); }
-  }, { passive: true });
+  }, { passive: true, signal: pageSignal });
   updateScroll();
-  window.addEventListener('resize', updateToc, { passive: true });
-  window.addEventListener('hashchange', updateToc);
+  window.addEventListener('resize', updateToc, { passive: true, signal: pageSignal });
+  window.addEventListener('hashchange', updateToc, { signal: pageSignal });
   document.querySelectorAll('[data-year]').forEach(node => { node.textContent = new Date().getFullYear(); });
 
   const revealItems = document.querySelectorAll('.reveal');
   if ('IntersectionObserver' in window && !reduceMotion.matches && !root.classList.contains('animations-off')) {
-    const revealObserver = new IntersectionObserver(entries => {
+    pageRevealObserver = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('is-visible');
-          revealObserver.unobserve(entry.target);
+          pageRevealObserver.unobserve(entry.target);
         }
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -35px 0px' });
-    revealItems.forEach(item => revealObserver.observe(item));
+    revealItems.forEach(item => pageRevealObserver.observe(item));
   } else {
     revealItems.forEach(item => item.classList.add('is-visible'));
   }
@@ -327,7 +601,7 @@
               card.style.setProperty('--tilt-y', `${((px - .5) * 4).toFixed(2)}deg`);
             }
           }
-        });
+        }, { signal: pageSignal });
       });
     });
   }
@@ -392,7 +666,7 @@
         }
       };
       fillTicker();
-      window.addEventListener('resize', fillTicker, { passive: true });
+      window.addEventListener('resize', fillTicker, { passive: true, signal: pageSignal });
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(fillTicker);
     }
   }
@@ -401,4 +675,80 @@
   if (reduceMotion.matches) document.querySelectorAll('svg').forEach(svg => {
     if (typeof svg.pauseAnimations === 'function') svg.pauseAnimations();
   });
+  };
+  initializePageContent();
+
+  let routeRequestId = 0;
+  const navigateInternally = async (url, addHistory = true) => {
+    const requestId = ++routeRequestId;
+    try {
+      const response = await fetch(url.href);
+      if (requestId !== routeRequestId) return;
+      if (!response.ok) { window.location.assign(url.href); return; }
+      const nextDocument = new DOMParser().parseFromString(await response.text(), 'text/html');
+      if (requestId !== routeRequestId) return;
+      const nextMain = nextDocument.querySelector('#main');
+      const currentMain = document.querySelector('#main');
+      if (!nextMain || !currentMain) { window.location.assign(url.href); return; }
+
+      window.__ns2HomeCleanup?.();
+      document.querySelectorAll('[data-page-runtime]').forEach(script => script.remove());
+      currentMain.replaceWith(document.importNode(nextMain, true));
+      document.title = nextDocument.title;
+      const nextDescription = nextDocument.querySelector('meta[name="description"]');
+      const currentDescription = document.querySelector('meta[name="description"]');
+      if (nextDescription && currentDescription) currentDescription.content = nextDescription.content;
+      const nextCanonical = nextDocument.querySelector('link[rel="canonical"]');
+      const currentCanonical = document.querySelector('link[rel="canonical"]');
+      if (nextCanonical && currentCanonical) currentCanonical.href = nextCanonical.href;
+      document.querySelectorAll('link[data-page-style]').forEach(style => style.remove());
+      nextDocument.querySelectorAll('link[rel="stylesheet"]').forEach(style => {
+        const href = new URL(style.getAttribute('href'), url);
+        if (!href.pathname.includes('/css/compatibility.css')) return;
+        const pageStyle = document.createElement('link');
+        pageStyle.rel = 'stylesheet';
+        pageStyle.href = href.href;
+        pageStyle.dataset.pageStyle = 'true';
+        document.head.appendChild(pageStyle);
+      });
+      if (addHistory) window.history.pushState({}, '', url.href);
+      document.querySelectorAll('.primary-nav a').forEach(link => {
+        const linkUrl = new URL(link.href, window.location.href);
+        link.classList.toggle('active', linkUrl.pathname === url.pathname);
+        if (link.classList.contains('active')) link.setAttribute('aria-current', 'page');
+        else link.removeAttribute('aria-current');
+      });
+      menuButton?.setAttribute('aria-expanded', 'false');
+      menuButton?.setAttribute('aria-label', 'Open navigation');
+      nav?.classList.remove('is-open');
+      initializePageContent();
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      if (url.hash) {
+        requestAnimationFrame(() => document.getElementById(decodeURIComponent(url.hash.slice(1)))?.scrollIntoView({ block: 'start' }));
+      }
+      const pageScripts = [...nextDocument.querySelectorAll('script[src]')]
+        .map(script => new URL(script.getAttribute('src'), url).href)
+        .filter(src => /\/(?:home|faq)\.js(?:$|\?)/.test(src));
+      pageScripts.forEach(src => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.dataset.pageRuntime = 'true';
+        document.body.appendChild(script);
+      });
+      document.dispatchEvent(new CustomEvent('site:pagechange', { detail: { url: url.href } }));
+    } catch (_) {
+      window.location.assign(url.href);
+    }
+  };
+  document.addEventListener('click', event => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const link = event.target.closest('a[href]');
+    if (!link || link.target || link.hasAttribute('download')) return;
+    const url = new URL(link.href, window.location.href);
+    if (url.origin !== window.location.origin || !/\.html?$/.test(url.pathname)) return;
+    if (url.pathname === window.location.pathname && url.hash) return;
+    event.preventDefault();
+    navigateInternally(url);
+  });
+  window.addEventListener('popstate', () => navigateInternally(new URL(window.location.href), false));
 })();
