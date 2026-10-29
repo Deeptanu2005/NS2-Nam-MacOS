@@ -1,8 +1,6 @@
 (() => {
-  window.__ns2HomeCleanup?.();
-  window.__ns2HomePanCleanup?.();
-  window.__ns2HomeCleanup = null;
-  window.__ns2HomePanCleanup = null;
+  window.__ns2NetworkWindowCleanup?.();
+  window.__ns2NetworkWindowCleanup = null;
   const root = document.documentElement;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -108,21 +106,35 @@
       if (event.key === 'Escape' && windowMode === 'maximized') restoreWindow();
     }, { signal: controller.signal });
 
-    let panX = 0, panY = 0, zoom = 1;
+    let panX = 0, panY = -10, zoom = 1.08;
     let gesturePointer = null, gestureMode = null, lastX = 0, lastY = 0;
     let lastZoomSoundAt = 0;
     let activeNode = null, nodeStart = null, nodeStartPoint = null;
     const nodePositions = {
       sender: { x: 145, y: 185 },
-      'receiver-1': { x: 385, y: 67 },
+      'receiver-1': { x: 385, y: 93 },
       'receiver-2': { x: 450, y: 185 },
-      'receiver-3': { x: 385, y: 304 },
+      'receiver-3': { x: 385, y: 276 },
     };
     const svgPoint = event => {
       const point = topology.createSVGPoint();
       point.x = event.clientX;
       point.y = event.clientY;
       return point.matrixTransform(topology.getScreenCTM().inverse());
+    };
+    const updateNetworkGlow = () => {
+      const positions = Object.values(nodePositions);
+      const x = (Math.min(...positions.map(point => point.x)) + Math.max(...positions.map(point => point.x))) / 2;
+      const y = (Math.min(...positions.map(point => point.y)) + Math.max(...positions.map(point => point.y))) / 2;
+      const viewBox = topology.viewBox.baseVal;
+      const svgWidth = Math.min(stage.clientWidth * .96, 620);
+      const viewScale = svgWidth / viewBox.width * zoom;
+      const centerX = viewBox.x + viewBox.width / 2;
+      const centerY = viewBox.y + viewBox.height / 2;
+      const glowX = stage.clientWidth / 2 + (x - centerX) * viewScale + panX;
+      const glowY = stage.clientHeight / 2 + (y - centerY) * viewScale + panY;
+      stage.style.setProperty('--network-glow-x', `${glowX}px`);
+      stage.style.setProperty('--network-glow-y', `${glowY}px`);
     };
     const renderConnections = () => {
       const sender = nodePositions.sender;
@@ -141,13 +153,21 @@
         route?.setAttribute('d', path);
         motion?.setAttribute('path', path);
       });
+      updateNetworkGlow();
     };
     const renderView = () => {
       stage.style.setProperty('--pan-x', `${panX}px`);
       stage.style.setProperty('--pan-y', `${panY}px`);
       stage.style.setProperty('--zoom', zoom);
       stage.style.setProperty('--grid-size', `${28 * zoom}px`);
+      updateNetworkGlow();
     };
+    const glowResizeObserver = typeof ResizeObserver === 'function'
+      ? new ResizeObserver(updateNetworkGlow)
+      : null;
+    if (glowResizeObserver) glowResizeObserver.observe(stage);
+    else window.addEventListener('resize', updateNetworkGlow, { passive: true, signal: controller.signal });
+    updateNetworkGlow();
     const cancelGesture = () => {
       if (gesturePointer !== null && stage.hasPointerCapture(gesturePointer)) stage.releasePointerCapture(gesturePointer);
       gesturePointer = null;
@@ -159,6 +179,8 @@
       const disabled = root.classList.contains('animations-off');
       windowMotionChanged({ detail: { animationsOff: disabled } });
     };
+    renderConnections();
+    renderView();
     syncWindowMotion();
     stage.addEventListener('pointerdown', event => {
       if (root.classList.contains('animations-off')) return;
@@ -244,74 +266,6 @@
       zoom = nextZoom;
       renderView();
     }, { passive: false, signal: controller.signal });
-    window.__ns2HomePanCleanup = () => controller.abort();
-  }
-
-  // Quiet particle field in the landing-page hero; paused for reduced motion.
-  const canvas = document.querySelector('.network-canvas');
-  if (canvas) {
-    const context = canvas.getContext('2d');
-    if (context) {
-      const controller = new AbortController();
-      let width = 0, height = 0, particles = [], frame = 0, running = false;
-      const motionAllowed = () => !reduceMotion.matches && !root.classList.contains('animations-off');
-      const resize = () => {
-        const rect = canvas.getBoundingClientRect();
-        const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-        width = rect.width; height = rect.height;
-        canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
-        context.setTransform(dpr, 0, 0, dpr, 0, 0);
-        const count = Math.min(50, Math.max(20, Math.floor(width / 23)));
-        particles = Array.from({ length: count }, () => ({
-          x: Math.random() * width, y: Math.random() * height,
-          vx: (Math.random() - .5) * .18, vy: (Math.random() - .5) * .15,
-          r: Math.random() * 1.4 + .4
-        }));
-      };
-      const colorToRgb = color => {
-        const hex = color.trim().match(/^#([\da-f]{6})$/i)?.[1];
-        if (!hex) return '125, 207, 223';
-        return [0, 2, 4].map(offset => parseInt(hex.slice(offset, offset + 2), 16)).join(', ');
-      };
-      const draw = () => {
-        if (!running) return;
-        context.clearRect(0, 0, width, height);
-        const point = colorToRgb(getComputedStyle(root).getPropertyValue('--cyan'));
-        const link = colorToRgb(getComputedStyle(root).getPropertyValue('--blue'));
-        for (let i = 0; i < particles.length; i += 1) {
-          const p = particles[i];
-          p.x += p.vx; p.y += p.vy;
-          if (p.x < 0 || p.x > width) p.vx *= -1;
-          if (p.y < 0 || p.y > height) p.vy *= -1;
-          context.beginPath(); context.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-          context.fillStyle = `rgba(${point}, .58)`; context.fill();
-          for (let j = i + 1; j < particles.length; j += 1) {
-            const q = particles[j];
-            const dx = p.x - q.x, dy = p.y - q.y, distance = Math.hypot(dx, dy);
-            if (distance < 115) {
-              context.beginPath(); context.moveTo(p.x, p.y); context.lineTo(q.x, q.y);
-              context.strokeStyle = `rgba(${link}, ${(1 - distance / 115) * .13})`;
-              context.lineWidth = .6; context.stroke();
-            }
-          }
-        }
-        frame = requestAnimationFrame(draw);
-      };
-      const start = () => {
-        if (!running && motionAllowed()) { running = true; draw(); }
-      };
-      const stop = () => {
-        if (running) { running = false; cancelAnimationFrame(frame); }
-      };
-      resize(); start();
-      window.addEventListener('resize', resize, { passive: true, signal: controller.signal });
-      document.addEventListener('site:motionchange', () => motionAllowed() ? start() : stop(), { signal: controller.signal });
-      reduceMotion.addEventListener('change', () => motionAllowed() ? start() : stop(), { signal: controller.signal });
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden) stop();
-        else start();
-      }, { signal: controller.signal });
-      window.__ns2HomeCleanup = () => { stop(); controller.abort(); };
-    }
+    window.__ns2NetworkWindowCleanup = () => { controller.abort(); glowResizeObserver?.disconnect(); };
   }
 })();

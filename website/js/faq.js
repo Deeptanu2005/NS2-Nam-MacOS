@@ -4,6 +4,13 @@
   const faqSearch = document.querySelector('#faq-search');
   const faqItems = [...document.querySelectorAll('.faq-item')];
   if (faqItems.length) {
+    document.querySelectorAll('[data-faq-total]').forEach(node => {
+      node.textContent = String(faqItems.length).padStart(2, '0');
+    });
+    faqItems.forEach((item, index) => {
+      const number = item.querySelector('.faq-num');
+      if (number) number.textContent = String(index + 1).padStart(2, '0');
+    });
     faqItems.forEach(item => {
       const summary = item.querySelector('summary');
       const answer = item.querySelector('.faq-answer');
@@ -63,7 +70,9 @@
 
   if (faqSearch && faqItems.length) {
     const count = document.querySelector('[data-faq-count]');
+    const countLabel = document.querySelector('[data-faq-count-label]');
     const empty = document.querySelector('.faq-empty');
+    if (count) count.textContent = String(faqItems.length).padStart(2, '0');
     faqSearch.addEventListener('input', () => {
       const query = faqSearch.value.trim().toLowerCase();
       let visible = 0;
@@ -73,6 +82,7 @@
         if (match) visible += 1;
       });
       if (count) count.textContent = String(visible).padStart(2, '0');
+      if (countLabel) countLabel.textContent = query ? 'MATCHES' : 'QUESTIONS';
       if (empty) empty.hidden = visible !== 0;
     });
   }

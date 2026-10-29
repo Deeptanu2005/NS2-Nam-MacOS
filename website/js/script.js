@@ -1066,10 +1066,14 @@
       const nextMain = nextDocument.querySelector('#main');
       const currentMain = document.querySelector('#main');
       if (!nextMain || !currentMain) { window.location.assign(url.href); return; }
+      const nextFooter = nextDocument.querySelector('footer.site-footer');
+      const currentFooter = document.querySelector('footer.site-footer');
 
-      window.__ns2HomeCleanup?.();
+      window.__ns2NetworkWindowCleanup?.();
+      window.__ns2AnimationEngineCleanup?.();
       document.querySelectorAll('[data-page-runtime]').forEach(script => script.remove());
       currentMain.replaceWith(document.importNode(nextMain, true));
+      if (nextFooter && currentFooter) currentFooter.replaceWith(document.importNode(nextFooter, true));
       document.title = nextDocument.title;
       const nextDescription = nextDocument.querySelector('meta[name="description"]');
       const currentDescription = document.querySelector('meta[name="description"]');
@@ -1104,7 +1108,7 @@
       }
       const pageScripts = [...nextDocument.querySelectorAll('script[src]')]
         .map(script => new URL(script.getAttribute('src'), url).href)
-        .filter(src => /\/(?:home|faq)\.js(?:$|\?)/.test(src));
+        .filter(src => /\/(?:network_window|animation_engine|faq)\.js(?:$|\?)/.test(src));
       pageScripts.forEach(src => {
         const script = document.createElement('script');
         script.src = src;

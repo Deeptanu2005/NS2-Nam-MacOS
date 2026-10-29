@@ -1,0 +1,357 @@
+/* Shared motion definitions for the static site. Keep animation timing and keyframes here. */
+
+@keyframes theme-reveal {
+  from { clip-path: circle(0 at var(--theme-origin-x, 50%) var(--theme-origin-y, 50%)); }
+  to { clip-path: circle(150vmax at var(--theme-origin-x, 50%) var(--theme-origin-y, 50%)); }
+}
+
+@keyframes theme-unblur {
+  from { filter: blur(5px); }
+  to { filter: blur(0); }
+}
+
+@keyframes githubArrowJump { 0%,100% { transform: translate(0,0); } 42% { transform: translate(3px,-3px) rotate(8deg); } 72% { transform: translate(1px,-2px); } }
+
+@keyframes customPickerBounce {
+  0% { opacity: 0; transform: translateY(-18px) scale(.84,.76) rotate(-1deg); }
+  48% { opacity: 1; transform: translateY(2px) scale(1.045,1.06) rotate(.6deg); }
+  70% { transform: translateY(-1px) scale(.985,.98) rotate(-.3deg); }
+  86% { transform: translateY(0) scale(1.012,1.015) rotate(.12deg); }
+  100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+}
+
+@keyframes customPickerBounceOut {
+  0% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+  24% { opacity: 1; transform: translateY(2px) scale(1.025,1.04) rotate(.35deg); }
+  100% { opacity: 0; transform: translateY(-15px) scale(.82,.72) rotate(-.8deg); }
+}
+
+@keyframes switchSwipeOn {
+  0% { opacity: 0; transform: translateX(-125%) skewX(-12deg); }
+  22% { opacity: .9; }
+  100% { opacity: 0; transform: translateX(125%) skewX(-12deg); }
+}
+
+@keyframes switchSwipeOff {
+  0% { opacity: 0; transform: translateX(125%) skewX(-12deg); }
+  22% { opacity: .9; }
+  100% { opacity: 0; transform: translateX(-125%) skewX(-12deg); }
+}
+
+@keyframes displayMenuLiquidIn {
+  0% { opacity: 0; transform: translate3d(5px,-12px,0) scale(.5,.12); border-radius: 28px 8px 24px 22px; }
+  34% { opacity: 1; transform: translate3d(-2px,3px,0) scale(1.08,1.16); border-radius: 24px 25px 12px 27px; }
+  52% { transform: translate3d(1px,-1px,0) scale(.96,.91); border-radius: 15px 24px 26px 18px; }
+  72% { transform: translate3d(0,1px,0) scale(1.025,1.045); border-radius: 23px 17px 22px 26px; }
+  86% { transform: translate3d(0,0,0) scale(.99,.985); border-radius: 19px 21px 18px 22px; }
+  100% { opacity: 1; transform: translate3d(0,0,0) scale(1); border-radius: 20px; }
+}
+
+@keyframes displayMenuLiquidOut {
+  0% { opacity: 1; transform: translate3d(0,0,0) scale(1); border-radius: 20px; }
+  35% { opacity: 1; transform: translate3d(-2px,2px,0) scale(1.04,.94); border-radius: 14px 24px 27px 18px; }
+  100% { opacity: 0; transform: translate3d(6px,-10px,0) scale(.48,.08); border-radius: 28px 8px 24px 22px; }
+}
+
+@keyframes displayAuraDrift {
+  0% { transform: translate3d(20px,-12px,0) scale(.7); opacity: .15; }
+  55% { transform: translate3d(-12px,8px,0) scale(1.08); opacity: .72; }
+  100% { transform: translate3d(0,0,0) scale(1); opacity: .48; }
+}
+
+@keyframes torchIgnite {
+  0% { clip-path: circle(0 at var(--theme-origin-x, 50%) var(--theme-origin-y, 50%)); opacity: .15; filter: blur(18px); }
+  55% { opacity: .9; filter: blur(8px); }
+  82% { clip-path: circle(150vmax at var(--theme-origin-x, 50%) var(--theme-origin-y, 50%)); opacity: .78; filter: blur(0); }
+  100% { clip-path: circle(150vmax at var(--theme-origin-x, 50%) var(--theme-origin-y, 50%)); opacity: 0; filter: blur(0); }
+}
+
+@keyframes torchFlame {
+  0% { opacity: 0; transform: translateY(7px) scale(.35,.25); }
+  38% { opacity: 1; transform: translateY(-1px) scale(.88,1.1); }
+  58% { transform: translateY(-2px) scale(1.08,.92) skewX(-4deg); }
+  76% { transform: translateY(-1px) scale(.96,1.05) skewX(4deg); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes torchHandle {
+  0%, 30% { opacity: 0; }
+  55%, 100% { opacity: 1; }
+}
+
+@keyframes smokeRise {
+  0% { opacity: 0; transform: translateY(9px) scale(.68); filter: blur(1px); }
+  14% { opacity: 1; }
+  43% { opacity: .88; }
+  100% { opacity: 0; transform: translateY(-43px) scale(1.65); filter: blur(6px); }
+}
+
+@keyframes torchPop {
+  0% { transform: translateY(5px) scale(.55); }
+  38% { transform: translateY(-5px) scale(2.5) rotate(-8deg); }
+  62% { transform: translateY(-3px) scale(1.95) rotate(5deg); }
+  100% { transform: translateY(-3px) scale(2.2); }
+}
+
+@keyframes sunHover {
+  45% { transform: rotate(200deg) scale(1.17); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes raysHover {
+  45% { transform: rotate(35deg) scale(1.12); }
+  100% { transform: rotate(0) scale(1); }
+}
+
+@keyframes moonHover {
+  35% { transform: translateY(-2px) rotate(-17deg) scale(1.12); filter: drop-shadow(0 0 5px color-mix(in srgb, var(--cyan) 75%, transparent)); }
+  70% { transform: translateY(1px) rotate(8deg) scale(.96); }
+  100% { transform: rotate(0) scale(1); filter: none; }
+}
+
+@keyframes macBackdropIn { from { opacity: 0; } to { opacity: 1; } }
+
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .38; } }
+
+@keyframes scan { from { transform: translateY(-10%); } to { transform: translateY(430%); } }
+
+@keyframes orbit { to { transform: rotate(360deg); } }
+
+@keyframes ticker { to { transform: translateX(-50%); } }
+
+@keyframes filefloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+
+@keyframes faqopen { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+@keyframes nodePulse { 0%,100% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); } 48% { transform: scale(1.16); filter: drop-shadow(0 0 4px var(--cyan)); } }
+
+@keyframes navbarPillDock {
+  0% { transform: translateY(-11px) scale(.96,.78); border-radius: 28px; }
+  55% { transform: translateY(1px) scale(1.014,1.075); border-radius: 999px; }
+  76% { transform: translateY(-.5px) scale(.995,.985); }
+  100% { transform: translateY(0) scale(1); border-radius: 999px; }
+}
+
+@keyframes navbarControlsFluid {
+  0% { opacity: .68; transform: translateX(-52px) scaleX(.32) scaleY(.78); }
+  38% { opacity: 1; transform: translateX(2px) scaleX(1.08) scaleY(.96); }
+  59% { transform: translateX(-1px) scaleX(.98) scaleY(1.025); }
+  79% { transform: translateX(1px) scaleX(1.01) scaleY(.995); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes navbarControlsReturn {
+  0% { transform: translateX(54px) scale(.94); }
+  58% { transform: translateX(-2px) scale(1.015); }
+  100% { transform: translateX(0) scale(1); }
+}
+
+@keyframes dataFlow { to { stroke-dashoffset: -10; } }
+
+@keyframes auroraDrift { from { background-position: 0% 0%, 0% 0%; transform: scale(1); } to { background-position: 18% 12%, -10% 18%; transform: scale(1.04); } }
+
+@keyframes heroFloat { 0%,100% { translate: 0 0; } 50% { translate: 0 -7px; } }
+
+@keyframes pageArrival { from { opacity: 0; translate: 0 14px; filter: blur(5px); } to { opacity: 1; translate: 0 0; filter: blur(0); } }
+
+@keyframes developerGlow { 0%, 100% { background-position: 100% 50%; filter: drop-shadow(0 0 0 transparent); } 50% { background-position: 0 50%; filter: drop-shadow(0 0 7px color-mix(in srgb, var(--cyan) 42%, transparent)); } }
+
+@keyframes creditIconArrival { 0% { opacity: 0; transform: translateY(9px) rotate(-12deg) scale(.82); } 72% { opacity: 1; transform: translateY(-2px) rotate(3deg) scale(1.06); } 100% { opacity: 1; transform: translateY(0) rotate(0) scale(1); } }
+
+@keyframes contactLinkArrival { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+
+@keyframes noticeLightSweep { 0%, 22% { left: -42%; opacity: 0; } 35% { opacity: .85; } 58%, 100% { left: 125%; opacity: 0; } }
+
+@keyframes supportLightSweep { 0%, 34% { left: -35%; opacity: 0; } 46% { opacity: .8; } 66%, 100% { left: 125%; opacity: 0; } }
+
+@keyframes ctaGlowDrift { from { transform: translate3d(-8%, 0, 0) scale(.94); opacity: .65; } to { transform: translate3d(12%, 8%, 0) scale(1.08); opacity: 1; } }
+
+@keyframes heroCascade { from { opacity: 0; transform: translateY(16px); filter: blur(8px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
+
+@keyframes iconBounce { 45% { transform: translateY(-5px) scale(1.08); } }
+
+@keyframes signalBlink { 0%,100% { opacity: .45; } 50% { opacity: 1; text-shadow: 0 0 12px var(--cyan); } }
+
+::view-transition-old(root) {animation: none;}
+
+::view-transition-new(root) {animation:
+    theme-reveal 1.2s cubic-bezier(.2, .75, .25, 1) both,
+    theme-unblur .9s cubic-bezier(.4, 0, .2, 1) both;}
+
+.site-header.is-floating .nav-shell {animation: navbarPillDock .86s cubic-bezier(.16,1.35,.3,1) both;}
+
+.site-header.is-floating .theme-toggle {animation: navbarControlsFluid .88s .04s cubic-bezier(.16,1.35,.3,1) both;}
+
+.site-header.is-floating .display-options-toggle {animation: navbarControlsFluid .88s .1s cubic-bezier(.16,1.35,.3,1) both;}
+
+.site-header.is-unfloating .nav-actions {animation: none;}
+
+.brand-node {animation: nodePulse 3.6s ease-in-out infinite;}
+
+.brand-node:nth-of-type(2) {animation-delay: .55s;}
+
+.brand-node:nth-of-type(3) {animation-delay: 1.1s;}
+
+.brand-link {animation: dataFlow 2.4s linear infinite;}
+
+.primary-nav .nav-github:hover span {animation: githubArrowJump .55s cubic-bezier(.2,.8,.2,1);}
+
+.display-options-panel.is-open {animation: displayMenuLiquidIn .72s cubic-bezier(.2,.8,.2,1) both;}
+
+.display-options-panel.is-closing {animation: displayMenuLiquidOut .42s cubic-bezier(.55,0,.9,.45) both;}
+
+.custom-picker-popover.is-open {animation: customPickerBounce .76s cubic-bezier(.16,1.1,.3,1) both;}
+
+.custom-picker-popover.is-closing {animation: customPickerBounceOut .42s cubic-bezier(.2,.8,.35,1) both;}
+
+.display-option.swipe-on .display-switch-sheen {animation: switchSwipeOn .56s cubic-bezier(.2,.8,.2,1) both;}
+
+.display-option.swipe-off .display-switch-sheen {animation: switchSwipeOff .56s cubic-bezier(.2,.8,.2,1) both;}
+
+.display-options-panel.is-open::before {animation: displayAuraDrift .8s cubic-bezier(.16,1,.3,1) both;}
+
+.theme-smoke.is-rising {animation: smokeRise 1.25s ease-out both;}
+
+::view-transition-new(torch-smoke) {animation: smokeRise 1.25s ease-out both;}
+
+.theme-torching .theme-toggle .theme-glyph {animation: torchPop .72s cubic-bezier(.2,.8,.2,1) both;}
+
+.theme-torch-reversing .theme-toggle .theme-glyph {animation: torchPop .72s cubic-bezier(.2,.8,.2,1) reverse both;}
+
+.theme-torching .theme-toggle .torch-flame {animation: torchFlame .72s cubic-bezier(.2,.8,.2,1) both;}
+
+.theme-torching .theme-toggle .torch-handle {animation: torchHandle .72s ease both;}
+
+.theme-torch-reversing .theme-toggle .torch-flame {animation: torchFlame .72s cubic-bezier(.2,.8,.2,1) reverse both;}
+
+.theme-torch-reversing .theme-toggle .torch-handle {animation: torchHandle .72s ease reverse both;}
+
+.theme-toggle:hover:not(:disabled) .theme-sun {animation: sunHover .9s cubic-bezier(.2,.8,.2,1);}
+
+.theme-toggle:hover:not(:disabled) .theme-rays {animation: raysHover .9s cubic-bezier(.2,.8,.2,1);}
+
+.theme-toggle:hover:not(:disabled) .theme-moon {animation: moonHover .75s cubic-bezier(.2,.8,.2,1);}
+
+.torch-to-light {animation: torchIgnite .72s cubic-bezier(.16,1,.3,1) both;}
+
+.torch-to-dark {animation: torchIgnite .72s cubic-bezier(.16,1,.3,1) reverse both;}
+
+.status-dot {animation: blink 2s ease-in-out infinite;}
+
+.orbit-one {animation: orbit 42s linear infinite;}
+
+.orbit-two {animation: orbit 55s linear infinite reverse;}
+
+.ticker-track {animation: ticker 32s linear infinite;}
+
+.ticker:hover .ticker-track {animation-play-state: paused;}
+
+.folder-file {animation: filefloat 4s ease-in-out infinite;}
+
+.folder-file.file-faint {animation-delay: -2s;}
+
+.developer-name {animation: developerGlow 4s ease-in-out infinite;}
+
+.credit-card.is-visible .credit-icon {animation: creditIconArrival .65s cubic-bezier(.2,.8,.2,1) both;}
+
+.credits-grid .credit-card:nth-child(2).is-visible .credit-icon {animation-delay: .16s;}
+
+.credit-card.is-visible .contact-links a {animation: contactLinkArrival .48s cubic-bezier(.2,.75,.25,1) both;}
+
+.credit-card.is-visible .contact-links a:nth-child(2) {animation-delay: .08s;}
+
+.credit-card.is-visible .contact-links a:nth-child(3) {animation-delay: .16s;}
+
+.third-party-notice::after {animation: noticeLightSweep 9s ease-in-out infinite;}
+
+.credits-support::before {animation: supportLightSweep 11s ease-in-out infinite;}
+
+.cta-glow {animation: ctaGlowDrift 8s ease-in-out infinite alternate;}
+
+@media (max-width: 980px) {.site-header.is-floating .nav-actions {animation: none;}.site-header.is-floating .theme-toggle,
+  .site-header.is-floating .display-options-toggle,
+  .site-header.is-unfloating .nav-actions {animation: none;}}
+
+@media (max-width: 760px) {.ticker-track {animation-duration: 23s;}}
+
+body::before {animation: auroraDrift 22s ease-in-out infinite alternate;}
+
+.brand:hover .brand-node {animation-duration: .9s;}
+
+.hero-visual {animation: heroFloat 8s ease-in-out infinite;}
+
+.hero-visual:hover {animation-play-state: paused;}
+
+.page-hero, .compat-hero {animation: pageArrival .9s cubic-bezier(.2,.7,.2,1) both;}
+
+@media (prefers-reduced-motion: reduce) {*, *::before, *::after {animation-duration: .01ms !important;animation-iteration-count: 1 !important;}}
+
+@media (hover: none) {.ticker:hover .ticker-track {animation-play-state: running;}}
+
+@media (hover: none) {.cta-glow {animation: none;}.compat-app-card:hover .compat-app-icon {animation: none;}}
+
+.js .hero .hero-copy.reveal.is-visible > .eyebrow,
+.js .hero .hero-copy.reveal.is-visible > h1,
+.js .hero .hero-copy.reveal.is-visible > .hero-lede,
+.js .hero .hero-copy.reveal.is-visible > .hero-actions,
+.js .hero .hero-copy.reveal.is-visible > .hero-facts {animation: heroCascade .72s cubic-bezier(.16,1,.3,1) both;}
+
+.js .hero .hero-copy.reveal.is-visible > h1 {animation-delay: .08s;}
+
+.js .hero .hero-copy.reveal.is-visible > .hero-lede {animation-delay: .17s;}
+
+.js .hero .hero-copy.reveal.is-visible > .hero-actions {animation-delay: .28s;}
+
+.js .hero .hero-copy.reveal.is-visible > .hero-facts {animation-delay: .4s;}
+
+@media (prefers-reduced-motion: reduce) {.js .hero .hero-copy.reveal.is-visible > .eyebrow,
+  .js .hero .hero-copy.reveal.is-visible > h1,
+  .js .hero .hero-copy.reveal.is-visible > .hero-lede,
+  .js .hero .hero-copy.reveal.is-visible > .hero-actions,
+  .js .hero .hero-copy.reveal.is-visible > .hero-facts {animation: none;}}
+
+html.animations-off *,
+html.animations-off *::before,
+html.animations-off *::after {animation: none !important;}
+
+html.animations-off::view-transition-old(root),
+html.animations-off::view-transition-new(root) {animation: none !important;}
+
+@media (prefers-reduced-motion: reduce) {.display-options-toggle,
+  .display-options-toggle svg,
+  .display-options-toggle svg circle,
+  .display-options-panel,
+  .display-options-panel h2,
+  .display-options-group h3,
+  .theme-color-controls,
+  .theme-color-note,
+  .accent-swatch,
+  .custom-picker-trigger,
+  .custom-picker-popover,
+  .custom-picker-hue-input,
+  .display-option,
+  .display-option-copy b,
+  .display-switch,
+  .display-switch-sheen,
+  .display-switch::after,
+  .display-options-toggle::before,
+  .display-options-panel::before,
+  .display-option::before {animation: none !important;}.display-options-panel.is-open,
+  .display-options-panel.is-closing {animation: none !important;}}
+
+.hero-visual.is-maximized:hover {animation-play-state: running;}
+
+@media (prefers-reduced-motion: reduce) {.hero-visual.is-maximized,
+  html.has-maximized-preview::after {animation: none;}}
+
+.compat-app-card:hover .compat-app-icon {animation: iconBounce .55s cubic-bezier(.2,.7,.2,1);}
+
+.compat-flow .flow-arrow {animation: signalBlink 2s ease-in-out infinite;}
+
+.compat-flow .flow-arrow:nth-of-type(2) {animation-delay: .65s;}
+
+.scanline {animation: scan 6s linear infinite;}
+
+html.has-maximized-preview::after {animation: macBackdropIn .16s ease both;}
+
+html.has-maximized-preview.is-restoring-preview::after {animation: none;}

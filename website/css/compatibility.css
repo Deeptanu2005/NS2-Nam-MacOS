@@ -7,6 +7,17 @@
 .compat-section-heading .eyebrow { margin-bottom: 8px; }
 .compat-section-heading h2 { margin: 0; font-size: clamp(27px, 3.5vw, 35px); line-height: 1.15; }
 .compat-section-heading > p { max-width: 335px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.compat-family-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.compat-family-card { position: relative; min-width: 0; min-height: 144px; padding: 19px 20px; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 12px; background: radial-gradient(ellipse at 100% 0, color-mix(in srgb, var(--cyan) 11%, transparent), transparent 58%), var(--panel); }
+.compat-family-card > span { color: var(--cyan); font: 9px var(--mono); letter-spacing: .13em; }
+.compat-family-card h3 { margin: 24px 0 7px; font-size: clamp(15px, 1.6vw, 20px); letter-spacing: -.045em; }
+.compat-family-card h3 i { color: var(--cyan); font-style: normal; }
+.compat-family-card p { max-width: 280px; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.65; }
+.compat-model-note { display: grid; grid-template-columns: 42px minmax(0, 1fr); align-items: center; gap: 14px; margin-top: 12px; padding: 14px 18px; border: 1px solid color-mix(in srgb, var(--cyan) 25%, var(--line)); border-radius: 10px; background: linear-gradient(100deg, color-mix(in srgb, var(--cyan) 7%, var(--panel-solid)), var(--panel-solid)); }
+.compat-model-note-mark { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid color-mix(in srgb, var(--cyan) 38%, var(--line)); border-radius: 50%; color: var(--cyan); font-size: 16px; }
+.compat-model-note p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.65; }
+.compat-model-note b { color: var(--ink); font-size: 12px; }
+.compat-model-note a { color: var(--cyan); text-decoration: underline; text-underline-offset: 3px; }
 
 /* Simple setup overview */
 .compat-ready-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: minmax(220px, auto); gap: 12px; }
@@ -62,6 +73,10 @@
   .compat-section-heading { align-items: flex-start; flex-direction: column; gap: 9px; margin-bottom: 16px; }
   .compat-section-heading > p { max-width: 510px; }
   .compat-ready-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+  .compat-family-grid { grid-template-columns: 1fr; gap: 9px; }
+  .compat-family-card { min-height: 124px; }
+  .compat-family-card h3 { margin-top: 18px; }
+  .compat-model-note { align-items: start; grid-template-columns: 34px minmax(0, 1fr); padding: 13px; }
   .compat-device-card { grid-column: auto; grid-row: auto; min-height: 220px; }
   .compat-app-card { min-height: 220px; }
   .compat-technical { margin-top: 0; padding: 21px; }
@@ -86,7 +101,7 @@
 /* Animated signals give the compatibility diagram a little network life. */
 .compat-device-card, .compat-app-card, .flow-node { transition: transform .3s cubic-bezier(.2,.7,.2,1), border-color .3s, box-shadow .3s; }
 .compat-device-card > *, .compat-app-card > * { position: relative; z-index: 1; }
-.compat-device-card::after, .compat-app-card::after { z-index: 0; content: ''; position: absolute; inset: 0; pointer-events: none; opacity: var(--glow-active, 0); background: radial-gradient(360px circle at var(--pointer-x, 50%) var(--pointer-y, 50%), color-mix(in srgb, var(--cyan) 13%, transparent), transparent 70%); transition: opacity .3s; }
+.compat-device-card::after, .compat-app-card::after { z-index: 0; content: ""; position: absolute; inset: 0; pointer-events: none; opacity: var(--glow-active, 0); background: radial-gradient(360px circle at var(--pointer-x, 50%) var(--pointer-y, 50%), color-mix(in srgb, var(--cyan) 13%, transparent), transparent 70%); transition: opacity .3s; }
 .compat-device-card:hover, .compat-app-card:hover { box-shadow: 0 16px 38px color-mix(in srgb, var(--cyan) 9%, transparent); }
 .chip-generations span { transition: transform .25s, background .25s, border-color .25s; }
 .compat-device-card:hover .chip-generations span { transform: translateY(-3px); border-color: color-mix(in srgb, var(--cyan) 55%, var(--line)); }
@@ -101,11 +116,6 @@
 .compat-device-card:hover .chip-generations span:nth-child(3) { transition-delay: .08s; }
 .compat-device-card:hover .chip-generations span:nth-child(4) { transition-delay: .12s; }
 .compat-device-card:hover .chip-generations span:nth-child(5) { transition-delay: .16s; }
-.compat-app-card:hover .compat-app-icon { animation: iconBounce .55s cubic-bezier(.2,.7,.2,1); }
-.compat-flow .flow-arrow { animation: signalBlink 2s ease-in-out infinite; }
-.compat-flow .flow-arrow:nth-of-type(2) { animation-delay: .65s; }
 .flow-symbol { transition: transform .35s cubic-bezier(.2,.7,.2,1), background .35s; }
 .flow-node:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--cyan) 42%, var(--line)); }
 .flow-node:hover .flow-symbol { transform: rotate(-8deg) scale(1.08); background: color-mix(in srgb, var(--cyan) 18%, transparent); }
-@keyframes iconBounce { 45% { transform: translateY(-5px) scale(1.08); } }
-@keyframes signalBlink { 0%,100% { opacity: .45; } 50% { opacity: 1; text-shadow: 0 0 12px var(--cyan); } }

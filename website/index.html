@@ -4,24 +4,25 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#081018">
-  <meta name="description" content="Run NS-2 and NAM on Apple Silicon Macs with a Docker-based environment, XQuartz display support, and a ready-to-run Tcl simulation.">
-  <meta name="keywords" content="NS-2 macOS, NS2 Apple Silicon, NAM Network Animator, NS-2 Docker, network simulation Mac">
+  <meta name="description" content="Run NS-2 and NAM on M-series Apple silicon Macs, including MacBook Air, MacBook Pro, Mac mini, iMac, Mac Studio, and Mac Pro, with Docker Desktop and XQuartz.">
   <link rel="canonical" href="https://deeptanu2005.github.io/NS2-Nam-MacOS/">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/common.css?v=20261029-curling-candle-smoke-v31">
+  <link rel="stylesheet" href="css/network_window.css?v=20261029-seam-fix-v7">
+  <link rel="stylesheet" href="css/common.css?v=20261029-header-glass-soft-v6">
+  <link rel="stylesheet" href="css/animation_engine.css?v=20261029-restructure-v1">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="NS2-Nam for macOS">
   <meta property="og:title" content="NS2-Nam for macOS — Network simulation, in motion">
-  <meta property="og:description" content="A Docker-based NS-2 and NAM environment for Apple Silicon Macs. Install, run a Tcl simulation, and animate your network with NAM.">
+  <meta property="og:description" content="Run NS-2 and NAM on M-series Macs—from MacBook Air and Pro to Mac mini, iMac, Mac Studio, and Mac Pro—with Docker Desktop and XQuartz.">
   <meta property="og:url" content="https://deeptanu2005.github.io/NS2-Nam-MacOS/">
   <meta property="og:image" content="https://deeptanu2005.github.io/NS2-Nam-MacOS/images/share_img.png">
   <meta property="og:image:alt" content="NS2-Nam for macOS with a network animation shown in NAM">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="NS2-Nam for macOS — Network simulation, in motion">
-  <meta name="twitter:description" content="Run NS-2 and NAM on Apple Silicon Macs through Docker and XQuartz.">
+  <meta name="twitter:description" content="Run NS-2 and NAM on M-series MacBook, mini, iMac, Studio, and Pro with Docker Desktop and XQuartz.">
   <meta name="twitter:image" content="https://deeptanu2005.github.io/NS2-Nam-MacOS/images/share_img.png">
   <meta name="twitter:image:alt" content="NS2-Nam for macOS with a NAM network animation">
   <title>NS2-Nam for macOS | Run NS-2 and NAM on Apple Silicon</title>
@@ -40,7 +41,7 @@
         "name": "NS2-Nam for macOS",
         "applicationCategory": "DeveloperApplication",
         "operatingSystem": "macOS",
-        "description": "A Docker-based environment for running NS-2 and NAM on Apple Silicon Macs using the linux/amd64 architecture and XQuartz for graphical output.",
+        "description": "A Docker-based environment for running NS-2 and NAM on Apple silicon MacBook Air, MacBook Pro, Mac mini, iMac, Mac Studio, and Mac Pro computers using the linux/amd64 architecture and XQuartz for graphical output.",
         "url": "https://github.com/Deeptanu2005/NS2-Nam-MacOS",
         "softwareVersion": "1.1.0"
       }
@@ -80,7 +81,7 @@
       <div class="hero-copy reveal">
         <div class="eyebrow"><span class="status-dot"></span> THE CLASSIC NETWORK LAB, REWIRED</div>
         <h1>Make the<br><span class="gradient-text">network move.</span></h1>
-        <p class="hero-lede">A tidy Docker workspace for NS-2 and NAM on Apple Silicon. Write a Tcl scenario, run it, and watch packets travel.</p>
+        <p class="hero-lede">Run NS-2 and NAM on M-series Macs—from MacBook Air and MacBook Pro to Mac mini, iMac, Mac Studio, and Mac Pro. Docker Desktop and XQuartz bring the classic network lab to Apple silicon.</p>
         <div class="hero-actions">
           <a class="button button-primary" href="installation.html">Get started <span aria-hidden="true">↗</span></a>
           <a class="button button-quiet" href="compatibility.html">Check compatibility <span aria-hidden="true">→</span></a>
@@ -93,18 +94,18 @@
       </div>
       <div class="hero-visual reveal reveal-delay" aria-label="Sample NAM network animation preview">
         <div class="visual-topline"><span class="window-controls" aria-label="Window controls"><button class="window-control window-close" type="button" disabled aria-label="Close unavailable" tabindex="-1"></button><button class="window-control window-minimize" type="button" disabled aria-label="Minimize unavailable" tabindex="-1"></button><button class="window-control window-zoom" type="button" data-window-action="zoom" aria-label="Zoom network preview" title="Zoom" aria-pressed="false"></button></span><span class="mono window-title">nam · send_receive.nam</span><span class="live-label">SIMULATION</span></div>
-        <div class="visual-stage" role="group" aria-label="Network preview. Drag a node to move it, drag empty space to pan, and scroll to zoom. Reload to reset.">
+        <div class="visual-stage" style="--pan-x: 0px; --pan-y: -10px; --zoom: 1.08; --grid-size: 30.24px;" role="group" aria-label="Network preview. Drag a node to move it, drag empty space to pan, and scroll to zoom. Reload to reset.">
           <div class="scanline"></div>
           <svg class="route-overlay" viewBox="0 0 620 365" role="img" aria-label="One sender connected to three receivers">
-            <defs><filter id="glow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-            <path class="route route-a" data-route="receiver-1" d="M173 171 L355 78"/><path class="route route-b" data-route="receiver-2" d="M176 185 L420 185"/><path class="route route-c" data-route="receiver-3" d="M173 199 L355 292"/>
+            <defs><filter id="glow" x="-35%" y="-35%" width="170%" height="170%"><feGaussianBlur stdDeviation="2.2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+            <path class="route route-a" data-route="receiver-1" d="M174 173.9 L357.9 103.4"/><path class="route route-b" data-route="receiver-2" d="M176 185 L420 185"/><path class="route route-c" data-route="receiver-3" d="M174 196 L357.9 265.7"/>
             <g class="draggable-node" data-node="sender" transform="translate(145 185)" tabindex="0" role="button" aria-label="Sender node. Drag or use arrow keys to move."><circle class="node sender-node" r="31"/><text y="5" text-anchor="middle">S</text><text class="node-label" y="57" text-anchor="middle">SENDER</text></g>
-            <g class="draggable-node" data-node="receiver-1" transform="translate(385 67)" tabindex="0" role="button" aria-label="Receiver 1 node. Drag or use arrow keys to move."><circle class="node receiver-node red-node" r="29"/><text y="5" text-anchor="middle">1</text><text class="node-label" y="-42" text-anchor="middle">RECEIVER</text></g>
+            <g class="draggable-node" data-node="receiver-1" transform="translate(385 93)" tabindex="0" role="button" aria-label="Receiver 1 node. Drag or use arrow keys to move."><circle class="node receiver-node red-node" r="29"/><text y="5" text-anchor="middle">1</text><text class="node-label" y="-42" text-anchor="middle">RECEIVER</text></g>
             <g class="draggable-node" data-node="receiver-2" transform="translate(450 185)" tabindex="0" role="button" aria-label="Receiver 2 node. Drag or use arrow keys to move."><circle class="node receiver-node green-node" r="29"/><text y="5" text-anchor="middle">2</text><text class="node-label" y="-42" text-anchor="middle">RECEIVER</text></g>
-            <g class="draggable-node" data-node="receiver-3" transform="translate(385 304)" tabindex="0" role="button" aria-label="Receiver 3 node. Drag or use arrow keys to move."><circle class="node receiver-node amber-node" r="29"/><text y="5" text-anchor="middle">3</text><text class="node-label" y="-42" text-anchor="middle">RECEIVER</text></g>
-            <circle class="packet packet-blue" r="5"><animateMotion data-motion="receiver-1" dur="2.8s" repeatCount="indefinite" path="M173 171 L355 78"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.12;.78;1" dur="2.8s" repeatCount="indefinite"/></circle>
+            <g class="draggable-node" data-node="receiver-3" transform="translate(385 276)" tabindex="0" role="button" aria-label="Receiver 3 node. Drag or use arrow keys to move."><circle class="node receiver-node amber-node" r="29"/><text y="5" text-anchor="middle">3</text><text class="node-label" y="-42" text-anchor="middle">RECEIVER</text></g>
+            <circle class="packet packet-blue" r="5"><animateMotion data-motion="receiver-1" dur="2.8s" repeatCount="indefinite" path="M174 173.9 L357.9 103.4"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.12;.78;1" dur="2.8s" repeatCount="indefinite"/></circle>
             <circle class="packet packet-red" r="5"><animateMotion data-motion="receiver-2" dur="3.2s" repeatCount="indefinite" path="M176 185 L420 185"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.12;.78;1" dur="3.2s" repeatCount="indefinite"/></circle>
-            <circle class="packet packet-amber" r="5"><animateMotion data-motion="receiver-3" dur="3.8s" repeatCount="indefinite" path="M173 199 L355 292"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.12;.78;1" dur="3.8s" repeatCount="indefinite"/></circle>
+            <circle class="packet packet-amber" r="5"><animateMotion data-motion="receiver-3" dur="3.8s" repeatCount="indefinite" path="M174 196 L357.9 265.7"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.12;.78;1" dur="3.8s" repeatCount="indefinite"/></circle>
           </svg>
           <div class="visual-caption"><span><i class="status-dot"></i> NAM TRACE READY</span><span class="mono">UDP / CBR · 3 FLOWS</span></div>
         </div>
@@ -137,9 +138,10 @@
 
     <section class="closing-cta wrap reveal"><div class="cta-glow"></div><div><p class="eyebrow">READY WHEN YOU ARE</p><h2>Start with the sample.<br>Build from there.</h2></div><a class="button button-primary" href="installation.html">Read the install guide <span>↗</span></a></section>
   </main>
-  <footer class="site-footer"><div class="footer-main wrap"><a class="brand" href="index.html"><svg class="brand-mark" aria-hidden="true" viewBox="0 0 32 32"><path class="brand-link" d="M9 8 23 15M9 24 23 17"/><circle class="brand-node" cx="8" cy="8" r="4"/><circle class="brand-node" cx="8" cy="24" r="4"/><circle class="brand-node" cx="24" cy="16" r="4"/></svg><span class="brand-wordmark">NS2<span class="brand-dash">/</span>Nam <span class="brand-platform">for macOS</span></span></a><p>A Docker-based NS-2 and NAM environment for Apple Silicon Macs.</p><div class="footer-links"><a href="installation.html">Installation</a><a href="compatibility.html">Compatibility</a><a href="troubleshooting.html">Troubleshooting</a><a href="faq.html">FAQ</a><a href="credits.html">Contact &amp; credits</a><a href="https://github.com/Deeptanu2005/NS2-Nam-MacOS" target="_blank" rel="noopener noreferrer">Source ↗</a></div></div><div class="footer-bottom wrap"><span>© <span data-year></span> NS2-Nam for macOS</span><a href="https://github.com/Deeptanu2005/NS2-Nam-MacOS/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">License</a><span class="mono">BUILT FOR THE PACKET CHASERS</span></div></footer>
+  <footer class="site-footer"><div class="footer-main wrap"><a class="brand" href="index.html"><svg class="brand-mark" aria-hidden="true" viewBox="0 0 32 32"><path class="brand-link" d="M9 8 23 15M9 24 23 17"/><circle class="brand-node" cx="8" cy="8" r="4"/><circle class="brand-node" cx="8" cy="24" r="4"/><circle class="brand-node" cx="24" cy="16" r="4"/></svg><span class="brand-wordmark">NS2<span class="brand-dash">/</span>Nam <span class="brand-platform">for macOS</span></span></a><p>A compact NS-2 and NAM lab for Apple silicon. Explore the workflow, run Tcl, and watch packets move.</p><div class="footer-links"><a href="installation.html">Installation</a><a href="compatibility.html">Compatibility</a><a href="troubleshooting.html">Troubleshooting</a><a href="faq.html">FAQ</a><a href="credits.html">Contact &amp; credits</a><a href="https://github.com/Deeptanu2005/NS2-Nam-MacOS" target="_blank" rel="noopener noreferrer">Source ↗</a></div></div><div class="footer-bottom wrap"><span>© <span data-year></span> NS2-Nam for macOS</span><a href="https://github.com/Deeptanu2005/NS2-Nam-MacOS/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">License</a><span class="mono">BUILT FOR THE PACKET CHASERS</span></div></footer>
   <div class="toast" role="status" aria-live="polite"></div>
-  <script src="js/script.js?v=20261029-window-motion-toggle-v30" defer></script>
-  <script src="js/home.js?v=20261029-window-motion-toggle-v30" defer></script>
+  <script src="js/script.js?v=20261029-footer-route-sync-v1" defer></script>
+  <script src="js/network_window.js?v=20261029-glow-anchor-v7" defer></script>
+  <script src="js/animation_engine.js?v=20261029-restructure-v1" defer></script>
 </body>
 </html>
