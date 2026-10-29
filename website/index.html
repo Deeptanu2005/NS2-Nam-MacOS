@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/common.css?v=20261028-theme-pickerclose-v16">
+  <link rel="stylesheet" href="css/common.css?v=20261029-curling-candle-smoke-v31">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="NS2-Nam for macOS">
   <meta property="og:title" content="NS2-Nam for macOS — Network simulation, in motion">
@@ -92,18 +92,19 @@
         </div>
       </div>
       <div class="hero-visual reveal reveal-delay" aria-label="Sample NAM network animation preview">
-        <div class="visual-topline"><span><i></i><i></i><i></i></span><span class="mono">nam · send_receive.nam</span><span class="live-label">SIMULATION</span></div>
-        <div class="visual-stage">
+        <div class="visual-topline"><span class="window-controls" aria-label="Window controls"><button class="window-control window-close" type="button" disabled aria-label="Close unavailable" tabindex="-1"></button><button class="window-control window-minimize" type="button" disabled aria-label="Minimize unavailable" tabindex="-1"></button><button class="window-control window-zoom" type="button" data-window-action="zoom" aria-label="Zoom network preview" title="Zoom" aria-pressed="false"></button></span><span class="mono window-title">nam · send_receive.nam</span><span class="live-label">SIMULATION</span></div>
+        <div class="visual-stage" role="group" aria-label="Network preview. Drag a node to move it, drag empty space to pan, and scroll to zoom. Reload to reset.">
           <div class="scanline"></div>
           <svg class="route-overlay" viewBox="0 0 620 365" role="img" aria-label="One sender connected to three receivers">
             <defs><filter id="glow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-            <path class="route route-a" d="M173 171 L355 78"/><path class="route route-b" d="M176 185 L420 185"/><path class="route route-c" d="M173 199 L355 292"/>
-            <circle class="node sender-node" cx="145" cy="185" r="31"/><circle class="node receiver-node red-node" cx="385" cy="67" r="29"/><circle class="node receiver-node green-node" cx="450" cy="185" r="29"/><circle class="node receiver-node amber-node" cx="385" cy="304" r="29"/>
-            <text x="145" y="190" text-anchor="middle">S</text><text x="385" y="72" text-anchor="middle">1</text><text x="450" y="190" text-anchor="middle">2</text><text x="385" y="309" text-anchor="middle">3</text>
-            <text class="node-label" x="145" y="242" text-anchor="middle">SENDER</text><text class="node-label" x="385" y="25" text-anchor="middle">RECEIVER</text><text class="node-label" x="450" y="143" text-anchor="middle">RECEIVER</text><text class="node-label" x="385" y="262" text-anchor="middle">RECEIVER</text>
-            <circle class="packet packet-blue" r="5"><animateMotion dur="2.8s" repeatCount="indefinite" path="M173 171 L355 78"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.12;.78;1" dur="2.8s" repeatCount="indefinite"/></circle>
-            <circle class="packet packet-red" r="5"><animateMotion dur="3.2s" repeatCount="indefinite" path="M176 185 L420 185"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.12;.78;1" dur="3.2s" repeatCount="indefinite"/></circle>
-            <circle class="packet packet-amber" r="5"><animateMotion dur="3.8s" repeatCount="indefinite" path="M173 199 L355 292"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.12;.78;1" dur="3.8s" repeatCount="indefinite"/></circle>
+            <path class="route route-a" data-route="receiver-1" d="M173 171 L355 78"/><path class="route route-b" data-route="receiver-2" d="M176 185 L420 185"/><path class="route route-c" data-route="receiver-3" d="M173 199 L355 292"/>
+            <g class="draggable-node" data-node="sender" transform="translate(145 185)" tabindex="0" role="button" aria-label="Sender node. Drag or use arrow keys to move."><circle class="node sender-node" r="31"/><text y="5" text-anchor="middle">S</text><text class="node-label" y="57" text-anchor="middle">SENDER</text></g>
+            <g class="draggable-node" data-node="receiver-1" transform="translate(385 67)" tabindex="0" role="button" aria-label="Receiver 1 node. Drag or use arrow keys to move."><circle class="node receiver-node red-node" r="29"/><text y="5" text-anchor="middle">1</text><text class="node-label" y="-42" text-anchor="middle">RECEIVER</text></g>
+            <g class="draggable-node" data-node="receiver-2" transform="translate(450 185)" tabindex="0" role="button" aria-label="Receiver 2 node. Drag or use arrow keys to move."><circle class="node receiver-node green-node" r="29"/><text y="5" text-anchor="middle">2</text><text class="node-label" y="-42" text-anchor="middle">RECEIVER</text></g>
+            <g class="draggable-node" data-node="receiver-3" transform="translate(385 304)" tabindex="0" role="button" aria-label="Receiver 3 node. Drag or use arrow keys to move."><circle class="node receiver-node amber-node" r="29"/><text y="5" text-anchor="middle">3</text><text class="node-label" y="-42" text-anchor="middle">RECEIVER</text></g>
+            <circle class="packet packet-blue" r="5"><animateMotion data-motion="receiver-1" dur="2.8s" repeatCount="indefinite" path="M173 171 L355 78"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.12;.78;1" dur="2.8s" repeatCount="indefinite"/></circle>
+            <circle class="packet packet-red" r="5"><animateMotion data-motion="receiver-2" dur="3.2s" repeatCount="indefinite" path="M176 185 L420 185"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.12;.78;1" dur="3.2s" repeatCount="indefinite"/></circle>
+            <circle class="packet packet-amber" r="5"><animateMotion data-motion="receiver-3" dur="3.8s" repeatCount="indefinite" path="M173 199 L355 292"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.12;.78;1" dur="3.8s" repeatCount="indefinite"/></circle>
           </svg>
           <div class="visual-caption"><span><i class="status-dot"></i> NAM TRACE READY</span><span class="mono">UDP / CBR · 3 FLOWS</span></div>
         </div>
@@ -138,7 +139,7 @@
   </main>
   <footer class="site-footer"><div class="footer-main wrap"><a class="brand" href="index.html"><svg class="brand-mark" aria-hidden="true" viewBox="0 0 32 32"><path class="brand-link" d="M9 8 23 15M9 24 23 17"/><circle class="brand-node" cx="8" cy="8" r="4"/><circle class="brand-node" cx="8" cy="24" r="4"/><circle class="brand-node" cx="24" cy="16" r="4"/></svg><span class="brand-wordmark">NS2<span class="brand-dash">/</span>Nam <span class="brand-platform">for macOS</span></span></a><p>A Docker-based NS-2 and NAM environment for Apple Silicon Macs.</p><div class="footer-links"><a href="installation.html">Installation</a><a href="compatibility.html">Compatibility</a><a href="troubleshooting.html">Troubleshooting</a><a href="faq.html">FAQ</a><a href="credits.html">Contact &amp; credits</a><a href="https://github.com/Deeptanu2005/NS2-Nam-MacOS" target="_blank" rel="noopener noreferrer">Source ↗</a></div></div><div class="footer-bottom wrap"><span>© <span data-year></span> NS2-Nam for macOS</span><a href="https://github.com/Deeptanu2005/NS2-Nam-MacOS/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">License</a><span class="mono">BUILT FOR THE PACKET CHASERS</span></div></footer>
   <div class="toast" role="status" aria-live="polite"></div>
-  <script src="js/script.js?v=20261028-theme-pickerclose-v16" defer></script>
-  <script src="js/home.js?v=20261028-theme-pickerclose-v16" defer></script>
+  <script src="js/script.js?v=20261029-window-motion-toggle-v30" defer></script>
+  <script src="js/home.js?v=20261029-window-motion-toggle-v30" defer></script>
 </body>
 </html>

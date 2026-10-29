@@ -29,7 +29,7 @@
 .compat-app-card h3 { margin-top: 7px; font-size: 15px; }
 .compat-app-card p { font-size: 10px; }
 .app-status { display: inline-flex; align-items: center; gap: 6px; margin-top: auto; padding-top: 9px; color: var(--faint); font: 8px var(--mono); letter-spacing: .08em; }
-.app-status i { width: 5px; height: 5px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); }
+.app-status i { width: 5px; height: 5px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
 .compat-install-link { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 13px; padding: 13px 16px; border: 1px solid var(--line); border-radius: 7px; background: color-mix(in srgb, var(--cyan) 4%, var(--panel-solid)); color: var(--muted); font-size: 11px; }
 .compat-install-link b { color: var(--cyan); font-size: 11px; }
 .compat-install-link i { margin-left: 8px; font-style: normal; }

@@ -154,6 +154,15 @@
         theme: [290, 880, .12, .023, 'sine'],
         navigation: [520, 680, .06, .017, 'triangle'],
         disclosure: [430, 590, .07, .017, 'sine'],
+        'window-open': [250, 820, .2, .024, 'sine'],
+        'window-restore': [780, 300, .17, .021, 'sine'],
+        'node-grab': [560, 360, .07, .014, 'triangle'],
+        'node-move': [480, 640, .045, .008, 'sine'],
+        'node-drop': [340, 680, .1, .016, 'sine'],
+        'pan-start': [260, 430, .06, .012, 'triangle'],
+        'pan-end': [430, 300, .075, .012, 'sine'],
+        'view-zoom-in': [440, 760, .055, .009, 'sine'],
+        'view-zoom-out': [760, 440, .055, .009, 'sine'],
       };
       const [startHz, endHz, duration, volume, waveform] = recipes[kind] || recipes.button;
       const scheduleTone = () => {
@@ -177,6 +186,7 @@
       // Audio is an optional enhancement; controls still work if Web Audio is unavailable.
     }
   };
+  window.ns2namPlayUiSound = playUiSound;
   const playThemeWhoosh = nextTheme => {
     if (root.classList.contains('sounds-off')) return;
     try {
@@ -340,7 +350,7 @@
   }, true);
   document.addEventListener('click', event => {
     const control = event.target.closest(interactiveSelector);
-    if (!control || control.disabled || control.matches('.display-options-toggle')) return;
+    if (!control || control.disabled || control.matches('.display-options-toggle, .window-control, .draggable-node')) return;
     if (!root.classList.contains('sounds-off')) {
       try { sessionStorage.setItem('ns2nam-audio-activated', '1'); } catch (_) {}
     }
