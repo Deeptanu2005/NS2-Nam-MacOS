@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 540" fill="none">
+  <defs>
+    <linearGradient id="edge" x1="0" y1="0" x2="900" y2="540" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f1f4f8" stop-opacity=".5"/>
+      <stop offset=".48" stop-color="#697584" stop-opacity=".48"/>
+      <stop offset="1" stop-color="#dce2eb" stop-opacity=".28"/>
+    </linearGradient>
+    <filter id="soft" x="-30%" y="-40%" width="160%" height="180%">
+      <feGaussianBlur stdDeviation="19"/>
+    </filter>
+  </defs>
+  <rect width="900" height="540" fill="#030405"/>
+  <g filter="url(#soft)" opacity=".62" stroke="url(#edge)" stroke-linecap="round" stroke-linejoin="round" stroke-width="64">
+    <path d="M-24 100h370c44 0 64 23 64 52s-20 52-64 52H157c-55 0-86 28-86 79v276"/>
+    <path d="M478 520V144c0-45 25-69 57-69s57 24 57 69v162c0 47 25 72 74 72h265"/>
+    <path d="M254 570V370c0-53 28-81 79-81h114c49 0 70 23 70 53s-21 53-70 53H339c-45 0-69 24-69 69v106"/>
+  </g>
+  <g opacity=".18" stroke="url(#edge)" stroke-linecap="round" stroke-linejoin="round" stroke-width="34">
+    <path d="M-24 100h370c44 0 64 23 64 52s-20 52-64 52H157c-55 0-86 28-86 79v276"/>
+    <path d="M478 520V144c0-45 25-69 57-69s57 24 57 69v162c0 47 25 72 74 72h265"/>
+    <path d="M254 570V370c0-53 28-81 79-81h114c49 0 70 23 70 53s-21 53-70 53H339c-45 0-69 24-69 69v106"/>
+  </g>
+</svg>
