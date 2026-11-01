@@ -4,6 +4,14 @@ Run NS-2 (Network Simulator 2) and NAM (Network Animator) on modern Apple Silico
 
 **Website:** [NS2-Nam for macOS](https://deeptanu2005.github.io/NS2-Nam-MacOS/)
 
+> [!NOTE]
+> **Community Testing is Open!**
+>
+> Help us test NS-2 and NAM on different Apple Silicon Macs (M1, M2, M3, M4 and newer).
+> Your feedback will help improve compatibility and reliability.
+>
+> [Participate in Compatibility Testing →](https://github.com/Deeptanu2005/NS2-Nam-MacOS/issues/3)
+
 <img width="1774" height="887" alt="NS2-NAM for macOS" src="website/images/github_poster.png" />
 
 ## Requirements
