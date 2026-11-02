@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0d090b">
-  <meta name="description" content="Help test NS-2 and NAM on Apple Silicon Macs (M1, M2, M3, M4 and newer). Share compatibility results, report issues and contribute improvements.">
+  <meta name="description" content="Help test NS-2 and NAM across Apple Silicon Mac models and macOS versions. Share compatibility results, report issues and contribute improvements.">
   <meta name="robots" content="index,follow,max-image-preview:large">
   <link rel="canonical" href="https://deeptanu2005.github.io/NS2-Nam-MacOS/community-testing/">
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
@@ -13,24 +13,24 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/network_window.css?v=20261029-seam-fix-v7">
-  <link rel="stylesheet" href="../css/common.css?v=20261029-header-glass-soft-v6">
+  <link rel="stylesheet" href="../css/common.css?v=20261102-header-blur-fade-v7">
   <link rel="stylesheet" href="../css/animation_engine.css?v=20261029-restructure-v1">
-  <link rel="stylesheet" href="community-entry.css?v=20261102-isolated-v1">
-  <link rel="stylesheet" href="community-testing.css?v=20261102-rainbow-loop-v24">
+  <link rel="stylesheet" href="community-entry.css?v=20261102-email-action-v2">
+  <link rel="stylesheet" href="community-testing.css?v=20261102-mobile-layout-v40">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="NS2-Nam for macOS">
-  <meta property="og:title" content="Community Testing: NS-2 &amp; NAM on Apple Silicon Macs">
-  <meta property="og:description" content="Help test NS-2 and NAM on Apple Silicon Macs (M1, M2, M3, M4 and newer). Share compatibility results, report issues and contribute improvements.">
+  <meta property="og:title" content="Community Testing: NS-2 &amp; NAM across Mac Models">
+  <meta property="og:description" content="Help test NS-2 and NAM across Apple Silicon Mac models and macOS versions. Share compatibility results, report issues and contribute improvements.">
   <meta property="og:url" content="https://deeptanu2005.github.io/NS2-Nam-MacOS/community-testing/">
   <meta property="og:image" content="https://deeptanu2005.github.io/NS2-Nam-MacOS/images/send_3receivers.png">
   <meta property="og:image:alt" content="NAM showing a network simulation with one sender and three receivers">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Community Testing: NS-2 &amp; NAM on Apple Silicon Macs">
-  <meta name="twitter:description" content="Help test NS-2 and NAM on Apple Silicon Macs (M1, M2, M3, M4 and newer). Share compatibility results and report issues.">
+  <meta name="twitter:title" content="Community Testing: NS-2 &amp; NAM across Mac Models">
+  <meta name="twitter:description" content="Help test NS-2 and NAM across Apple Silicon Mac models and macOS versions. Share compatibility results and report issues.">
   <meta name="twitter:image" content="https://deeptanu2005.github.io/NS2-Nam-MacOS/images/send_3receivers.png">
   <meta name="twitter:image:alt" content="NAM showing a running network simulation">
-  <title>Community Testing: NS-2 &amp; NAM on Apple Silicon Macs</title>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Community Testing: NS-2 & NAM on Apple Silicon Macs","url":"https://deeptanu2005.github.io/NS2-Nam-MacOS/community-testing/","description":"Community compatibility testing for Network Simulator 2 and NAM on Apple Silicon Macs."}</script>
+  <title>Community Testing: NS-2 &amp; NAM across Mac Models</title>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Community Testing: NS-2 & NAM across Mac Models","url":"https://deeptanu2005.github.io/NS2-Nam-MacOS/community-testing/","description":"Community compatibility testing across Apple Silicon Mac models and macOS versions."}</script>
 </head>
 <body class="community-campaign-page">
   <div class="community-intro-loader" aria-hidden="true"><span class="entry-loader-orbit"><i></i><i></i><i></i></span><span class="entry-loader-copy"><b>Preparing the test lab</b><i>NS-2 · NAM · APPLE SILICON</i></span></div>
@@ -38,6 +38,7 @@
   <header class="site-header">
     <div class="nav-shell">
       <a class="brand" href="../" aria-label="NS2/Nam for macOS home"><svg class="brand-mark" aria-hidden="true" viewBox="0 0 32 32"><path class="brand-link" d="M9 8 23 15M9 24 23 17"/><circle class="brand-node" cx="8" cy="8" r="4"/><circle class="brand-node" cx="8" cy="24" r="4"/><circle class="brand-node" cx="24" cy="16" r="4"/></svg><span class="brand-wordmark">NS2<span class="brand-dash">/</span>Nam <span class="brand-platform">for macOS</span></span></a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" aria-label="Open navigation"><span></span><span></span></button>
       <nav class="primary-nav" id="primary-nav" aria-label="Main navigation"><a href="../">Overview</a><a href="../installation.html">Install</a><a href="../compatibility.html">Compatibility</a><a href="../troubleshooting.html">Troubleshooting</a><a href="../faq.html">FAQ</a><a href="../credits.html">Credits</a><a class="nav-github" href="https://github.com/Deeptanu2005/NS2-Nam-MacOS" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a></nav>
     </div>
   </header>
@@ -45,7 +46,7 @@
     <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="../">Home</a><span aria-hidden="true">/</span><span aria-current="page">Community testing</span></nav>
     <section class="community-hero" aria-labelledby="page-title">
       <div class="eyebrow"><span class="status-dot"></span> OPEN COMMUNITY TESTING</div>
-      <div class="community-hero-layout"><div><h1 id="page-title">Community testing<br><span class="gradient-text">is open.</span></h1><p>Help check Network Simulator 2 (NS-2) and NAM across Apple Silicon Macs and macOS versions. We welcome results from M1, M2, M3, M4 and newer processors. Successful runs are just as useful as bug reports.</p><a class="campaign-entry community-report-button" href="https://github.com/Deeptanu2005/NS2-Nam-MacOS/issues/3" target="_blank" rel="noopener noreferrer" aria-label="Submit your testing report on GitHub Issue 3"><span class="entry-open"><i></i> ISSUE #3</span><span>SUBMIT YOUR TESTING REPORT</span><span class="entry-arrow" aria-hidden="true">→</span><span class="entry-flash" aria-hidden="true"></span></a></div><div class="silicon-laptop" role="img" aria-label="MacBook screen cycling through M1, M2, M3, M4, and newer Apple Silicon compatibility testing"><div class="laptop-model"><div class="laptop-screen"><div class="laptop-screen-content"><span class="screen-kicker">COMMUNITY COMPATIBILITY TESTING</span><div class="screen-processor"><strong data-screen-processor>M1</strong><i aria-hidden="true">→</i></div><p>NS-2 + NAM</p><small>APPLE SILICON TEST RUN</small><div class="screen-progress" aria-hidden="true"><i></i></div></div><span class="screen-sweep" aria-hidden="true"></span></div><div class="laptop-base" aria-hidden="true"><span class="laptop-trackpad"></span></div></div></div></div>
+      <div class="community-hero-layout"><div><h1 id="page-title">Community testing<br><span class="gradient-text">is open.</span></h1><p>Help test Network Simulator 2 (NS-2) and NAM across different Mac models and macOS versions, from MacBook Air and MacBook Pro to Mac mini and iMac. Successful runs are just as useful as bug reports.</p><a class="campaign-entry community-report-button" href="https://github.com/Deeptanu2005/NS2-Nam-MacOS/issues/3" target="_blank" rel="noopener noreferrer" aria-label="Submit your testing report on GitHub Issue 3"><span class="entry-open"><i></i> ISSUE #3</span><span>SUBMIT YOUR TESTING REPORT</span><span class="entry-arrow" aria-hidden="true">→</span><span class="entry-flash" aria-hidden="true"></span></a></div><div class="silicon-laptop" role="img" aria-label="MacBook screen cycling through different Mac models for NS-2 and NAM compatibility testing"><div class="laptop-model"><div class="laptop-screen"><div class="laptop-screen-content"><span class="screen-kicker">MAC MODEL + macOS TESTING</span><div class="screen-device"><strong data-screen-device>Air</strong><i aria-hidden="true">→</i></div><p>NS-2 + NAM</p><small>MAC COMPATIBILITY TEST RUN</small><div class="screen-progress" aria-hidden="true"><i></i></div></div><span class="screen-sweep" aria-hidden="true"></span></div><div class="laptop-base" aria-hidden="true"><span class="laptop-trackpad"></span></div></div></div></div>
     </section>
 
     <section class="community-section process-section" aria-labelledby="process-title">
@@ -56,17 +57,32 @@
 
     <section class="community-section screenshot-section" aria-labelledby="screenshot-title">
       <div class="screenshot-copy"><p class="eyebrow">WHAT TO SHARE</p><h2 id="screenshot-title">Show NAM in action</h2><p>Please include a screenshot of the NAM window displaying a running network simulation. Screenshots of installation errors or other problems are welcome too.</p><p class="privacy-note"><strong>Privacy reminder</strong> Hide passwords, private IP addresses, usernames and other sensitive information before uploading screenshots.</p></div>
-      <figure class="nam-example"><img src="../images/send_3receivers.png" alt="Example of NAM displaying a running network simulation with one sender and three receivers" loading="lazy" width="3476" height="2046"><figcaption>Example of a successful NAM simulation. Your submitted screenshot should show NAM displaying a running network simulation.</figcaption></figure>
+      <figure class="nam-example"><img src="../images/send_3receivers.png" alt="Example of NAM displaying a running network simulation with one sender and three receivers" loading="lazy" decoding="async" width="3476" height="2046"><figcaption>Example of a successful NAM simulation. Your submitted screenshot should show NAM displaying a running network simulation.</figcaption></figure>
     </section>
 
     <section class="community-section report-section" aria-labelledby="report-title">
-      <div class="community-section-heading"><div><p class="eyebrow">INCLUDE IN YOUR COMMENT</p><h2 id="report-title">System and test results</h2></div><p>Share what you know; mark anything unavailable as “Not sure.”</p></div>
+      <div class="community-section-heading"><div><p class="eyebrow">INCLUDE IN YOUR REPORT</p><h2 id="report-title">System and test results</h2></div><p>Share what you know; mark anything unavailable as “Not sure.”</p></div>
       <div class="report-grid">
-        <div class="report-block"><h3>System information</h3><dl class="report-fields"><div><dt>Mac model</dt><dd>e.g. MacBook Air M2</dd></div><div><dt>Processor</dt><dd>M1 / M2 / M3 / M4 / newer</dd></div><div><dt>macOS version</dt><dd>Installed version</dd></div><div><dt>Docker Desktop</dt><dd>Installed version</dd></div><div><dt>XQuartz</dt><dd>Installed version</dd></div><div><dt>Xcode Command Line Tools</dt><dd>Installed / Not Installed / Not Sure</dd></div></dl></div>
+        <div class="report-block"><h3>System information</h3><dl class="report-fields"><div><dt>Mac model</dt><dd>e.g. MacBook Air 13-inch</dd></div><div><dt>Processor</dt><dd>M1 / M2 / M3 / M4 / newer</dd></div><div><dt>macOS version</dt><dd>Installed version</dd></div><div><dt>Docker Desktop</dt><dd>Installed version</dd></div><div><dt>XQuartz</dt><dd>Installed version</dd></div><div><dt>Xcode Command Line Tools</dt><dd>Installed / Not Installed / Not Sure</dd></div></dl></div>
         <div class="report-block"><h3>Testing results</h3><dl class="report-fields results-fields"><div><dt>Installation</dt><dd>Successful / Failed</dd></div><div><dt>NS-2</dt><dd>Working / Not Working</dd></div><div><dt>NAM</dt><dd>Working / Not Working</dd></div><div><dt>Sample simulation</dt><dd>Successful / Failed / Not Tested</dd></div></dl><h3 class="problems-title">Problems and suggestions</h3><p>Describe errors or difficulties, confusing installation steps, and improvements you would suggest.</p></div>
       </div>
       <p class="developer-note"><strong>Developer contributions:</strong> Fix compatibility issues, improve installation scripts, suggest enhancements, or submit a Pull Request.</p>
-      <div class="report-template"><div class="template-heading"><div><h3>Copyable report template</h3><p>Copy the template, fill in the details, and post it as a comment on GitHub Issue #3.</p></div><button class="copy-button" type="button" data-copy="### Mac Configuration&#10;- **Mac Model:**&#10;- **Processor:** M1 / M2 / M3 / M4 / Other&#10;- **macOS Version:**&#10;- **Docker Desktop Version:**&#10;- **XQuartz Version:**&#10;- **Xcode Command Line Tools:** Installed / Not Installed / Not Sure&#10;&#10;### Testing Results&#10;- **Installation:** Successful / Failed&#10;- **NS-2:** Working / Not Working&#10;- **NAM:** Working / Not Working&#10;- **Sample Simulation:** Successful / Failed / Not Tested&#10;&#10;### Problems Encountered&#10;Describe any errors or difficulties you faced.&#10;&#10;### Suggestions &amp; Improvements&#10;What could be improved? Did you encounter any confusing steps?&#10;&#10;### Additional Comments&#10;Any other feedback is welcome!">COPY TEMPLATE</button></div><pre><code>### Mac Configuration
+      <aside class="recognition-note" aria-labelledby="recognition-title"><h3 id="recognition-title">Recognition</h3><p>I'd love to appreciate everyone who helps test this project by sharing their names on LinkedIn. If you'd like to be mentioned, provide your details below. You can use a pseudonym if you prefer to remain anonymous.</p></aside>
+      <div class="report-template">
+        <div class="template-heading"><div><h3>Copyable report template</h3><p>Choose a format, fill in the details, then submit it as a GitHub comment or by email.</p></div></div>
+        <div class="template-tabs" role="tablist" aria-label="Report format">
+          <button class="template-tab" id="report-tab-github" type="button" role="tab" aria-selected="true" aria-controls="report-panel-github" tabindex="0" data-report-tab="github">GitHub</button>
+          <button class="template-tab" id="report-tab-email" type="button" role="tab" aria-selected="false" aria-controls="report-panel-email" tabindex="-1" data-report-tab="email">Email</button>
+        </div>
+        <div class="template-stage">
+        <section class="template-panel" id="report-panel-github" role="tabpanel" aria-labelledby="report-tab-github" data-report-panel="github">
+          <div class="template-panel-heading"><p>Paste this Markdown into a comment on <a href="https://github.com/Deeptanu2005/NS2-Nam-MacOS/issues/3" target="_blank" rel="noopener noreferrer">GitHub Issue #3</a>.</p><button class="copy-button" type="button" data-copy="### Tester Information&#10;- **Name / Pseudonym:** (Use any random name if you prefer to remain anonymous)&#10;- **LinkedIn Profile URL:** (Optional)&#10;- **GitHub Profile URL:** (Optional)&#10;&#10;### Mac Configuration&#10;- **Mac Model:**&#10;- **Processor:** M1 / M2 / M3 / M4 / Other&#10;- **macOS Version:**&#10;- **Docker Desktop Version:**&#10;- **XQuartz Version:**&#10;- **Xcode Command Line Tools:** Installed / Not Installed / Not Sure&#10;&#10;### Testing Results&#10;- **Installation:** Successful / Failed&#10;- **NS-2:** Working / Not Working&#10;- **NAM:** Working / Not Working&#10;- **Sample Simulation:** Successful / Failed / Not Tested&#10;&#10;### Problems Encountered&#10;Describe any errors or difficulties you faced.&#10;&#10;### Suggestions &amp; Improvements&#10;What could be improved? Did you encounter any confusing steps?&#10;&#10;### Additional Comments&#10;Any other feedback is welcome!">COPY</button></div>
+          <pre><code>### Tester Information
+- **Name / Pseudonym:** (Use any random name if you prefer to remain anonymous)
+- **LinkedIn Profile URL:** (Optional)
+- **GitHub Profile URL:** (Optional)
+
+### Mac Configuration
 - **Mac Model:**
 - **Processor:** M1 / M2 / M3 / M4 / Other
 - **macOS Version:**
@@ -87,12 +103,54 @@ Describe any errors or difficulties you faced.
 What could be improved? Did you encounter any confusing steps?
 
 ### Additional Comments
-Any other feedback is welcome!</code></pre></div>
+Any other feedback is welcome!</code></pre>
+        </section>
+        <section class="template-panel" id="report-panel-email" role="tabpanel" aria-labelledby="report-tab-email" data-report-panel="email" hidden>
+          <div class="email-details"><p><strong>To</strong><a href="mailto:deeptanusends2005@gmail.com">deeptanusends2005@gmail.com</a><button class="detail-copy" type="button" data-copy="deeptanusends2005@gmail.com" aria-label="Copy email address">COPY</button></p><p><strong>Subject</strong><span>NS-2 &amp; NAM Test Report — [Mac model / macOS version]</span><button class="detail-copy" type="button" data-copy="NS-2 &amp; NAM Test Report — [Mac model / macOS version]" aria-label="Copy email subject">COPY</button></p></div>
+          <div class="template-panel-heading"><p>Use the subject above and copy this email body.</p><button class="copy-button" type="button" data-copy="Hello,&#10;&#10;Here are my NS-2 and NAM testing results.&#10;&#10;TESTER INFORMATION&#10;Name / Pseudonym: (Use any random name if you prefer to remain anonymous)&#10;LinkedIn Profile URL: (Optional)&#10;GitHub Profile URL: (Optional)&#10;&#10;MAC CONFIGURATION&#10;Mac model:&#10;Processor: M1 / M2 / M3 / M4 / Other&#10;macOS version:&#10;Docker Desktop version:&#10;XQuartz version:&#10;Xcode Command Line Tools: Installed / Not Installed / Not Sure&#10;&#10;TESTING RESULTS&#10;Installation: Successful / Failed&#10;NS-2: Working / Not Working&#10;NAM: Working / Not Working&#10;Sample simulation: Successful / Failed / Not Tested&#10;&#10;PROBLEMS ENCOUNTERED&#10;Describe any errors or difficulties.&#10;&#10;SUGGESTIONS AND IMPROVEMENTS&#10;What could be improved? Were any steps confusing?&#10;&#10;ADDITIONAL COMMENTS&#10;Any other feedback.&#10;&#10;I have attached any relevant screenshots.&#10;&#10;Thanks!">COPY BODY</button></div>
+          <pre><code>Hello,
+
+Here are my NS-2 and NAM testing results.
+
+TESTER INFORMATION
+Name / Pseudonym: (Use any random name if you prefer to remain anonymous)
+LinkedIn Profile URL: (Optional)
+GitHub Profile URL: (Optional)
+
+MAC CONFIGURATION
+Mac model:
+Processor: M1 / M2 / M3 / M4 / Other
+macOS version:
+Docker Desktop version:
+XQuartz version:
+Xcode Command Line Tools: Installed / Not Installed / Not Sure
+
+TESTING RESULTS
+Installation: Successful / Failed
+NS-2: Working / Not Working
+NAM: Working / Not Working
+Sample simulation: Successful / Failed / Not Tested
+
+PROBLEMS ENCOUNTERED
+Describe any errors or difficulties.
+
+SUGGESTIONS AND IMPROVEMENTS
+What could be improved? Were any steps confusing?
+
+ADDITIONAL COMMENTS
+Any other feedback.
+
+I have attached any relevant screenshots.
+
+Thanks!</code></pre>
+        </section>
+        </div>
+      </div>
     </section>
 
-    <section class="community-submit" aria-labelledby="submit-title"><div><p class="eyebrow">ONE PLACE FOR EVERY REPORT</p><h2 id="submit-title">Share your results on GitHub</h2><p>Post testing reports, screenshots, errors and suggestions as a comment on Community Testing issue #3.</p></div><div class="submit-actions"><a class="campaign-entry community-report-button" href="https://github.com/Deeptanu2005/NS2-Nam-MacOS/issues/3" target="_blank" rel="noopener noreferrer" aria-label="Submit your testing report on GitHub Issue 3"><span class="entry-open"><i></i> ISSUE #3</span><span>SUBMIT YOUR TESTING REPORT</span><span class="entry-arrow" aria-hidden="true">→</span><span class="entry-flash" aria-hidden="true"></span></a></div></section>
+    <section class="community-submit" aria-labelledby="submit-title"><div><p class="eyebrow">CHOOSE HOW TO SEND IT</p><h2 id="submit-title">Share your test report</h2><p>There are two options: post your report as a comment on GitHub Issue #3, or email it to <a href="mailto:deeptanusends2005@gmail.com">deeptanusends2005@gmail.com</a>. Attach screenshots if they help explain your results.</p></div><div class="submit-actions"><a class="campaign-entry community-report-button" href="https://github.com/Deeptanu2005/NS2-Nam-MacOS/issues/3" target="_blank" rel="noopener noreferrer" aria-label="Submit your testing report on GitHub Issue 3"><span class="entry-open"><i></i> ISSUE #3</span><span>COMMENT ON GITHUB</span><span class="entry-arrow" aria-hidden="true">→</span><span class="entry-flash" aria-hidden="true"></span></a><a class="campaign-entry email-entry" href="mailto:deeptanusends2005@gmail.com?subject=NS-2%20%26%20NAM%20Test%20Report%20%E2%80%94%20%5BMac%20model%20%2F%20macOS%20version%5D" aria-label="Email your testing report to deeptanusends2005@gmail.com"><span class="entry-open"><i></i> EMAIL</span><span>EMAIL YOUR REPORT</span><span class="entry-arrow" aria-hidden="true">→</span><span class="entry-flash" aria-hidden="true"></span></a></div></section>
   </main>
-  <footer class="site-footer"><div class="footer-main wrap"><a class="brand" href="../" aria-label="NS2/Nam for macOS home"><svg class="brand-mark" aria-hidden="true" viewBox="0 0 32 32"><path class="brand-link" d="M9 8 23 15M9 24 23 17"/><circle class="brand-node" cx="8" cy="8" r="4"/><circle class="brand-node" cx="8" cy="24" r="4"/><circle class="brand-node" cx="24" cy="16" r="4"/></svg><span class="brand-wordmark">NS2<span class="brand-dash">/</span>Nam <span class="brand-platform">for macOS</span></span></a><p>Community compatibility testing for NS-2 and NAM on Apple Silicon.</p><div class="footer-links"><a href="../installation.html">Installation</a><a href="../compatibility.html">Compatibility</a><a href="../troubleshooting.html">Troubleshooting</a><a href="../faq.html">FAQ</a><a href="https://github.com/Deeptanu2005/NS2-Nam-MacOS/issues/3" target="_blank" rel="noopener noreferrer">Testing issue ↗</a></div></div></footer>
-  <script src="community-entry.js?v=20261102-isolated-v1" defer></script>
+  <footer class="site-footer"><div class="footer-main wrap"><a class="brand" href="../" aria-label="NS2/Nam for macOS home"><svg class="brand-mark" aria-hidden="true" viewBox="0 0 32 32"><path class="brand-link" d="M9 8 23 15M9 24 23 17"/><circle class="brand-node" cx="8" cy="8" r="4"/><circle class="brand-node" cx="8" cy="24" r="4"/><circle class="brand-node" cx="24" cy="16" r="4"/></svg><span class="brand-wordmark">NS2<span class="brand-dash">/</span>Nam <span class="brand-platform">for macOS</span></span></a><p>Community compatibility testing across Mac models and macOS versions.</p><div class="footer-links"><a href="../installation.html">Installation</a><a href="../compatibility.html">Compatibility</a><a href="../troubleshooting.html">Troubleshooting</a><a href="../faq.html">FAQ</a><a href="https://github.com/Deeptanu2005/NS2-Nam-MacOS/issues/3" target="_blank" rel="noopener noreferrer">Testing issue ↗</a></div></div></footer>
+  <script src="community-entry.js?v=20261102-device-testing-copy-v11" defer></script>
 </body>
 </html>
