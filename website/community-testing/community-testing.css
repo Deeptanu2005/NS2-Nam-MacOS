@@ -84,6 +84,8 @@ body.community-campaign-page { background: radial-gradient(ellipse at 50% 0%, rg
 .recognition-note { margin: 18px 0 0; padding: 15px 18px; border-left: 2px solid var(--cyan); background: linear-gradient(100deg, rgba(255,120,76,.09), transparent 78%); }
 .recognition-note h3 { margin: 0 0 5px; color: var(--ink); font-size: 14px; }
 .recognition-note p { max-width: 780px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.recognition-note a { display: inline-flex; align-items: baseline; gap: 4px; color: var(--cyan); font-weight: 800; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--cyan) 55%, transparent); text-underline-offset: 3px; transition: color .2s, text-decoration-color .2s; }
+.recognition-note a:hover { color: #ffb08c; text-decoration-color: currentColor; }
 .report-template { margin-top: 24px; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 14px; background: radial-gradient(ellipse at 12% 0%, rgba(255,120,76,.08), transparent 38%), var(--panel-solid); }
 .template-heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 17px 20px; border-bottom: 1px solid var(--line); }
 .template-heading h3 { margin: 0 0 5px; font-size: 14px; }
