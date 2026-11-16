@@ -12,6 +12,7 @@
     const controller = new AbortController();
     const visual = stage.closest('.hero-visual');
     const zoomButton = visual.querySelector('[data-window-action="zoom"]');
+    const resetButton = visual.querySelector('[data-window-action="reset"]');
     let windowMode = 'normal';
     let windowAnimation = null;
     const playWindowSound = kind => window.ns2namPlayUiSound?.(kind);
@@ -81,7 +82,9 @@
         cancelGesture();
         stage.inert = true;
         zoomButton.disabled = true;
+        if (resetButton) resetButton.disabled = true;
         if (zoomButton.matches(':focus')) zoomButton.blur();
+        if (resetButton?.matches(':focus')) resetButton.blur();
         topology.querySelectorAll('.draggable-node').forEach(node => {
           node.setAttribute('tabindex', '-1');
           node.setAttribute('aria-disabled', 'true');
@@ -90,6 +93,7 @@
       } else {
         stage.inert = false;
         zoomButton.disabled = false;
+        if (resetButton) resetButton.disabled = false;
         topology.querySelectorAll('.draggable-node').forEach(node => {
           node.setAttribute('tabindex', '0');
           node.removeAttribute('aria-disabled');
@@ -106,28 +110,70 @@
       if (event.key === 'Escape' && windowMode === 'maximized') restoreWindow();
     }, { signal: controller.signal });
 
-    let panX = 0, panY = -10, zoom = 1.08;
+    const defaultPanX = 0, defaultPanY = -10, defaultZoom = 1.08;
+    let panX = defaultPanX, panY = defaultPanY, zoom = defaultZoom;
     let gesturePointer = null, gestureMode = null, lastX = 0, lastY = 0;
     let lastZoomSoundAt = 0;
     let activeNode = null, nodeStart = null, nodeStartPoint = null;
+    const defaultNodePositions = {
+      sender: { x: 145, y: 185 },
+      'receiver-1': { x: 385, y: 93 },
+      'receiver-2': { x: 450, y: 185 },
+      'receiver-3': { x: 385, y: 276 },
+    };
     const nodePositions = {
       sender: { x: 145, y: 185 },
       'receiver-1': { x: 385, y: 93 },
       'receiver-2': { x: 450, y: 185 },
       'receiver-3': { x: 385, y: 276 },
     };
+    let resetAnimationId = null;
+    const stopResetAnimation = () => {
+      if (resetAnimationId !== null) {
+        cancelAnimationFrame(resetAnimationId);
+        resetAnimationId = null;
+      }
+    };
     const svgPoint = event => {
       const point = topology.createSVGPoint();
       point.x = event.clientX;
       point.y = event.clientY;
-      return point.matrixTransform(topology.getScreenCTM().inverse());
+      const ctm = topology.getScreenCTM();
+      return ctm ? point.matrixTransform(ctm.inverse()) : { x: point.x, y: point.y };
+    };
+    const findNodeAtPoint = event => {
+      const direct = event.target?.closest?.('.draggable-node');
+      if (direct && topology.contains(direct)) return direct;
+      const pt = svgPoint(event);
+      let bestNode = null;
+      let bestDist = Infinity;
+      for (const [id, pos] of Object.entries(nodePositions)) {
+        const dx = pt.x - pos.x;
+        const dy = pt.y - pos.y;
+        const dist = Math.hypot(dx, dy);
+        const radius = id === 'sender' ? 36 : 34;
+        const inCircle = dist <= radius;
+        const inLabel = id === 'sender'
+          ? Math.abs(dx) <= 38 && dy >= 0 && dy <= 72
+          : Math.abs(dx) <= 38 && dy >= -58 && dy <= 0;
+        if (inCircle || inLabel) {
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestNode = topology.querySelector(`[data-node="${id}"]`);
+          }
+        }
+      }
+      return bestNode;
     };
     const updateNetworkGlow = () => {
       const positions = Object.values(nodePositions);
       const x = (Math.min(...positions.map(point => point.x)) + Math.max(...positions.map(point => point.x))) / 2;
       const y = (Math.min(...positions.map(point => point.y)) + Math.max(...positions.map(point => point.y))) / 2;
       const viewBox = topology.viewBox.baseVal;
-      const svgWidth = Math.min(stage.clientWidth * .96, 620);
+      const topologyWidth = topology.getBoundingClientRect().width;
+      const svgWidth = (topologyWidth && zoom)
+        ? (topologyWidth / zoom)
+        : Math.min(stage.clientWidth * .96, 620);
       const viewScale = svgWidth / viewBox.width * zoom;
       const centerX = viewBox.x + viewBox.width / 2;
       const centerY = viewBox.y + viewBox.height / 2;
@@ -168,8 +214,82 @@
     if (glowResizeObserver) glowResizeObserver.observe(stage);
     else window.addEventListener('resize', updateNetworkGlow, { passive: true, signal: controller.signal });
     updateNetworkGlow();
+    const resetNetworkPositions = () => {
+      if (root.classList.contains('animations-off')) return;
+      if (gesturePointer !== null && stage.hasPointerCapture(gesturePointer)) {
+        try { stage.releasePointerCapture(gesturePointer); } catch (_) {}
+      }
+      gesturePointer = null;
+      gestureMode = null;
+      activeNode = null;
+      stage.classList.remove('is-panning', 'is-node-dragging');
+      playWindowSound('window-restore');
+
+      if (resetAnimationId !== null || !motionEnabled()) {
+        stopResetAnimation();
+        panX = defaultPanX;
+        panY = defaultPanY;
+        zoom = defaultZoom;
+        for (const [id, pos] of Object.entries(defaultNodePositions)) {
+          nodePositions[id] = { ...pos };
+        }
+        renderConnections();
+        renderView();
+        return;
+      }
+
+      stopResetAnimation();
+      const startPositions = {};
+      for (const [id, pos] of Object.entries(nodePositions)) {
+        startPositions[id] = { ...pos };
+      }
+      const startPanX = panX, startPanY = panY, startZoom = zoom;
+      let startTime = null;
+      const duration = 280;
+      const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+
+      const step = now => {
+        if (startTime === null) startTime = now;
+        const elapsed = Math.max(0, now - startTime);
+        const progress = Math.min(1, elapsed / duration);
+        const eased = easeOutCubic(progress);
+
+        for (const [id, target] of Object.entries(defaultNodePositions)) {
+          const start = startPositions[id];
+          nodePositions[id] = {
+            x: start.x + (target.x - start.x) * eased,
+            y: start.y + (target.y - start.y) * eased,
+          };
+        }
+        panX = startPanX + (defaultPanX - startPanX) * eased;
+        panY = startPanY + (defaultPanY - startPanY) * eased;
+        zoom = startZoom + (defaultZoom - startZoom) * eased;
+
+        renderConnections();
+        renderView();
+
+        if (progress < 1) {
+          resetAnimationId = requestAnimationFrame(step);
+        } else {
+          resetAnimationId = null;
+          for (const [id, target] of Object.entries(defaultNodePositions)) {
+            nodePositions[id] = { ...target };
+          }
+          panX = defaultPanX;
+          panY = defaultPanY;
+          zoom = defaultZoom;
+          renderConnections();
+          renderView();
+        }
+      };
+      resetAnimationId = requestAnimationFrame(step);
+    };
+    resetButton?.addEventListener('click', resetNetworkPositions, { signal: controller.signal });
     const cancelGesture = () => {
-      if (gesturePointer !== null && stage.hasPointerCapture(gesturePointer)) stage.releasePointerCapture(gesturePointer);
+      stopResetAnimation();
+      if (gesturePointer !== null && stage.hasPointerCapture(gesturePointer)) {
+        try { stage.releasePointerCapture(gesturePointer); } catch (_) {}
+      }
       gesturePointer = null;
       gestureMode = null;
       activeNode = null;
@@ -185,13 +305,15 @@
     stage.addEventListener('pointerdown', event => {
       if (root.classList.contains('animations-off')) return;
       if (event.button !== 0 || gesturePointer !== null) return;
+      stopResetAnimation();
       event.preventDefault();
       gesturePointer = event.pointerId;
       lastX = event.clientX;
       lastY = event.clientY;
-      activeNode = event.target.closest?.('.draggable-node') || null;
+      activeNode = findNodeAtPoint(event);
       if (activeNode && topology.contains(activeNode)) {
         gestureMode = 'node';
+        activeNode.focus?.();
         playWindowSound('node-grab');
         nodeStart = { ...nodePositions[activeNode.dataset.node] };
         nodeStartPoint = svgPoint(event);
@@ -201,7 +323,7 @@
         playWindowSound('pan-start');
         stage.classList.add('is-panning');
       }
-      stage.setPointerCapture(event.pointerId);
+      try { stage.setPointerCapture(event.pointerId); } catch (_) {}
     }, { signal: controller.signal });
     stage.addEventListener('pointermove', event => {
       if (root.classList.contains('animations-off')) return;
@@ -214,7 +336,7 @@
           y: nodeStart.y + point.y - nodeStartPoint.y,
         };
         renderConnections();
-      } else {
+      } else if (gestureMode === 'pan') {
         panX += event.clientX - lastX;
         panY += event.clientY - lastY;
         lastX = event.clientX;
@@ -230,12 +352,19 @@
       activeNode = null;
       stage.classList.remove('is-panning');
       stage.classList.remove('is-node-dragging');
-      if (stage.hasPointerCapture(event.pointerId)) stage.releasePointerCapture(event.pointerId);
+      if (stage.hasPointerCapture(event.pointerId)) {
+        try { stage.releasePointerCapture(event.pointerId); } catch (_) {}
+      }
     };
     stage.addEventListener('pointerup', endPan, { signal: controller.signal });
     stage.addEventListener('pointercancel', endPan, { signal: controller.signal });
     topology.addEventListener('keydown', event => {
       if (root.classList.contains('animations-off')) return;
+      if (event.key === 'r' || event.key === 'R') {
+        event.preventDefault();
+        resetNetworkPositions();
+        return;
+      }
       const node = event.target.closest?.('.draggable-node');
       if (!node || !['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) return;
       event.preventDefault();
@@ -250,6 +379,7 @@
     }, { signal: controller.signal });
     stage.addEventListener('wheel', event => {
       if (root.classList.contains('animations-off')) return;
+      stopResetAnimation();
       event.preventDefault();
       const rect = stage.getBoundingClientRect();
       const anchorX = event.clientX - rect.left - rect.width / 2;
@@ -266,6 +396,10 @@
       zoom = nextZoom;
       renderView();
     }, { passive: false, signal: controller.signal });
-    window.__ns2NetworkWindowCleanup = () => { controller.abort(); glowResizeObserver?.disconnect(); };
+    window.__ns2NetworkWindowCleanup = () => {
+      stopResetAnimation();
+      controller.abort();
+      glowResizeObserver?.disconnect();
+    };
   }
 })();

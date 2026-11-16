@@ -146,23 +146,23 @@
       if (!context) return;
 
       const recipes = {
-        button: [480, 690, .065, .018, 'triangle'],
-        toggle: [390, 760, .085, .022, 'sine'],
-        'switch-on': [430, 920, .12, .018, 'sine'],
-        'switch-off': [760, 360, .13, .016, 'triangle'],
-        menu: [340, 610, .095, .02, 'sine'],
-        theme: [290, 880, .12, .023, 'sine'],
-        navigation: [520, 680, .06, .017, 'triangle'],
-        disclosure: [430, 590, .07, .017, 'sine'],
-        'window-open': [250, 820, .2, .024, 'sine'],
-        'window-restore': [780, 300, .17, .021, 'sine'],
-        'node-grab': [560, 360, .07, .014, 'triangle'],
-        'node-move': [480, 640, .045, .008, 'sine'],
-        'node-drop': [340, 680, .1, .016, 'sine'],
-        'pan-start': [260, 430, .06, .012, 'triangle'],
-        'pan-end': [430, 300, .075, .012, 'sine'],
-        'view-zoom-in': [440, 760, .055, .009, 'sine'],
-        'view-zoom-out': [760, 440, .055, .009, 'sine'],
+        button: [480, 690, .065, .072, 'triangle'],
+        toggle: [390, 760, .085, .085, 'sine'],
+        'switch-on': [430, 920, .12, .072, 'sine'],
+        'switch-off': [760, 360, .13, .064, 'triangle'],
+        menu: [340, 610, .095, .08, 'sine'],
+        theme: [290, 880, .12, .09, 'sine'],
+        navigation: [520, 680, .06, .068, 'triangle'],
+        disclosure: [430, 590, .07, .068, 'sine'],
+        'window-open': [250, 820, .2, .095, 'sine'],
+        'window-restore': [780, 300, .17, .085, 'sine'],
+        'node-grab': [560, 360, .07, .056, 'triangle'],
+        'node-move': [480, 640, .045, .036, 'sine'],
+        'node-drop': [340, 680, .1, .068, 'sine'],
+        'pan-start': [260, 430, .06, .048, 'triangle'],
+        'pan-end': [430, 300, .075, .048, 'sine'],
+        'view-zoom-in': [440, 760, .055, .042, 'sine'],
+        'view-zoom-out': [760, 440, .055, .042, 'sine'],
       };
       const [startHz, endHz, duration, volume, waveform] = recipes[kind] || recipes.button;
       const scheduleTone = () => {
@@ -204,7 +204,7 @@
       filter.frequency.setValueAtTime(lighting ? 170 : 2100, now);
       filter.frequency.exponentialRampToValueAtTime(lighting ? 2100 : 170, now + .55);
       gain.gain.setValueAtTime(.0001, now);
-      gain.gain.exponentialRampToValueAtTime(.032, now + .12);
+      gain.gain.exponentialRampToValueAtTime(.095, now + .12);
       gain.gain.exponentialRampToValueAtTime(.0001, now + .72);
       whoosh.connect(filter);
       filter.connect(gain);
@@ -225,7 +225,7 @@
       const delay = context.createDelay(.2);
       const echo = context.createGain();
       delay.delayTime.setValueAtTime(.065, now);
-      echo.gain.setValueAtTime(.13, now);
+      echo.gain.setValueAtTime(.25, now);
       delay.connect(echo);
       echo.connect(context.destination);
 
@@ -244,7 +244,7 @@
         lowpass.type = 'lowpass';
         lowpass.frequency.setValueAtTime(1450, start);
         voice.gain.setValueAtTime(.0001, start);
-        voice.gain.exponentialRampToValueAtTime(.016 - index * .002, start + .009);
+        voice.gain.exponentialRampToValueAtTime(.065 - index * .008, start + .009);
         voice.gain.exponentialRampToValueAtTime(.0001, start + .18);
         oscillator.connect(lowpass);
         lowpass.connect(voice);
@@ -275,7 +275,7 @@
       fireFilter.frequency.setValueAtTime(900, now);
       fireFilter.frequency.exponentialRampToValueAtTime(lighting ? 1450 : 360, now + (lighting ? .62 : .25));
       fireGain.gain.setValueAtTime(.0001, now);
-      fireGain.gain.exponentialRampToValueAtTime(lighting ? .012 : .009, now + .045);
+      fireGain.gain.exponentialRampToValueAtTime(lighting ? .048 : .036, now + .045);
       fireGain.gain.exponentialRampToValueAtTime(.0001, now + (lighting ? .64 : .28));
       fire.connect(fireFilter);
       fireFilter.connect(fireGain);
@@ -293,7 +293,7 @@
         popFilter.type = 'bandpass';
         popFilter.frequency.setValueAtTime(1900 + Math.random() * 1500, start);
         popFilter.Q.setValueAtTime(1.1, start);
-        const peak = (lighting ? .009 : .006) * (1 - index / (crackleTimes.length * 1.5));
+        const peak = (lighting ? .036 : .024) * (1 - index / (crackleTimes.length * 1.5));
         popGain.gain.setValueAtTime(.0001, start);
         popGain.gain.exponentialRampToValueAtTime(peak, start + .004);
         popGain.gain.exponentialRampToValueAtTime(.0001, start + .032);
@@ -313,7 +313,7 @@
         smokeFilter.frequency.setValueAtTime(850, now + .06);
         smokeFilter.frequency.exponentialRampToValueAtTime(2400, now + .42);
         smokeGain.gain.setValueAtTime(.0001, now + .06);
-        smokeGain.gain.exponentialRampToValueAtTime(.008, now + .13);
+        smokeGain.gain.exponentialRampToValueAtTime(.032, now + .13);
         smokeGain.gain.exponentialRampToValueAtTime(.0001, now + .44);
         smoke.connect(smokeFilter);
         smokeFilter.connect(smokeGain);

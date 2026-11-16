@@ -339,7 +339,8 @@ html.animations-off::view-transition-new(root) {animation: none !important;}
   .display-option::before {animation: none !important;}.display-options-panel.is-open,
   .display-options-panel.is-closing {animation: none !important;}}
 
-.hero-visual.is-maximized:hover {animation-play-state: running;}
+.hero-visual.is-maximized,
+.hero-visual.is-maximized:hover {animation: none !important;}
 
 @media (prefers-reduced-motion: reduce) {.hero-visual.is-maximized,
   html.has-maximized-preview::after {animation: none;}}
